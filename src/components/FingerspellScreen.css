@@ -1,0 +1,195 @@
+/* ── Fingerspell Mode Select ─────────────────────────────── */
+.fspell {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  position: relative;
+  z-index: 1;
+}
+
+.fspell-content {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 32px 24px 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.fspell-back {
+  align-self: flex-start;
+}
+
+.fspell-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 6vw, 2.8rem);
+  font-weight: 900;
+  color: var(--gold);
+  letter-spacing: 6px;
+  text-shadow: 0 0 40px rgba(201, 168, 76, 0.35);
+  text-align: center;
+}
+
+.fspell-subtitle {
+  font-family: var(--font-display);
+  font-size: clamp(0.85rem, 2vw, 1.1rem);
+  color: var(--gold-dim);
+  letter-spacing: 3px;
+  margin-top: -14px;
+}
+
+.fspell-divider {
+  width: 100px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+
+.fspell-desc {
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  color: var(--cream);
+  text-align: center;
+  line-height: 1.6;
+  max-width: 400px;
+}
+
+/* ── Mode cards ────────────────────────────────────────── */
+.fspell-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+}
+
+.fspell-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: rgba(26, 58, 34, 0.5);
+  border: 1px solid var(--gold-dim);
+  border-radius: var(--radius);
+  padding: 20px;
+  cursor: pointer;
+  transition: border-color var(--transition), transform var(--transition);
+  text-align: left;
+  width: 100%;
+  font-family: inherit;
+  color: inherit;
+  animation: fadeInUp 400ms ease both;
+}
+
+.fspell-card:nth-child(2) {
+  animation-delay: 80ms;
+}
+
+.fspell-card:hover {
+  border-color: var(--gold);
+  transform: translateY(-2px);
+}
+
+.fspell-card-icon {
+  font-size: 1.8rem;
+}
+
+.fspell-card-titles {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.fspell-card-ga {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  color: var(--gold-light);
+  letter-spacing: 2px;
+}
+
+.fspell-card-en {
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  color: var(--cream-dim);
+}
+
+.fspell-card-desc {
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  color: var(--cream);
+  line-height: 1.5;
+}
+
+/* Disabled card */
+.fspell-card:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.fspell-card:disabled:hover {
+  border-color: var(--gold-dim);
+  transform: none;
+}
+
+/* ── Mode toggle ───────────────────────────────────────── */
+.fspell-mode-toggle {
+  display: flex;
+  gap: 2px;
+  background: rgba(201, 168, 76, 0.1);
+  border: 1px solid var(--gold-dim);
+  border-radius: var(--radius);
+  padding: 3px;
+}
+
+.fspell-mode-btn {
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  letter-spacing: 1.5px;
+  padding: 8px 18px;
+  border: none;
+  border-radius: calc(var(--radius) - 2px);
+  background: transparent;
+  color: var(--cream-dim);
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition);
+}
+
+.fspell-mode-btn:hover {
+  color: var(--cream);
+}
+
+.fspell-mode-active {
+  background: var(--gold);
+  color: var(--green-dark);
+}
+
+.fspell-mode-active:hover {
+  color: var(--green-dark);
+}
+
+/* Train button */
+.fspell-train-btn {
+  animation: fadeInUp 300ms ease both;
+}
+
+/* ── Note ──────────────────────────────────────────────── */
+.fspell-note {
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  color: var(--cream-dim);
+  text-align: center;
+  line-height: 1.5;
+}
+
+.fspell-note-label {
+  font-family: var(--font-display);
+  font-size: 0.68rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--gold-dim);
+  margin-right: 6px;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

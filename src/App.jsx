@@ -8,6 +8,10 @@ import ModuleSelect from './components/ModuleSelect';
 import ModuleDetail from './components/ModuleDetail';
 import SettingsPanel from './components/SettingsPanel';
 import MySignsScreen from './components/MySignsScreen';
+import FingerspellScreen from './components/FingerspellScreen';
+import FingerspellGame from './components/FingerspellGame';
+import FingerspellComm from './components/FingerspellComm';
+import FingerspellTraining from './components/FingerspellTraining';
 import { getModuleTrainableSigns, GESTURES } from './data/signs';
 import {
   loadGestures,
@@ -18,6 +22,11 @@ import {
   importGestures,
   getGestureSummary,
 } from './utils/gestureStorage';
+import {
+  loadFingerspellData,
+  saveFingerspellData,
+  getTrainedLetters,
+} from './utils/fingerspellStorage';
 import './App.css';
 
 // Module progress storage
@@ -53,6 +62,11 @@ export default function App() {
   const trainSignsRef = useRef(null);
   const gameSignsRef = useRef(null);
 
+  // ── Fingerspell state ───────────────────────────────────
+  const [fsMode, setFsMode] = useState('mediapipe'); // 'mediapipe' | 'cnn'
+  const [fsLettersTrained, setFsLettersTrained] = useState(0);
+  const fsTrainingDataRef = useRef([]);
+
   // Load saved gestures on mount
   useEffect(() => {
     try {
@@ -66,6 +80,15 @@ export default function App() {
     } catch {
       setStorageError('Saved gesture data appears corrupted. You can clear it and retrain.');
     }
+
+    // Load fingerspell training data
+    try {
+      const fsSaved = loadFingerspellData();
+      if (fsSaved && fsSaved.samples.length > 0) {
+        fsTrainingDataRef.current = fsSaved.samples;
+        setFsLettersTrained(getTrainedLetters().length);
+      }
+    } catch { /* ignore */ }
   }, []);
 
   const refreshSummary = useCallback(() => {
@@ -78,6 +101,10 @@ export default function App() {
   const goModules = useCallback(() => setScreen('modules'), []);
   const goSettings = useCallback(() => setScreen('settings'), []);
   const goMySigns = useCallback(() => setScreen('my-signs'), []);
+  const goFingerspell = useCallback(() => setScreen('fingerspell'), []);
+  const goFingerspellGame = useCallback(() => setScreen('fingerspell-game'), []);
+  const goFingerspellComm = useCallback(() => setScreen('fingerspell-comm'), []);
+  const goFingerspellTraining = useCallback(() => setScreen('fingerspell-training'), []);
 
   const goTraining = useCallback(() => {
     trainSignsRef.current = null;
@@ -135,6 +162,16 @@ export default function App() {
       setScreen('welcome');
     }
   }, [refreshSummary, activeModuleId]);
+
+  // ── Fingerspell training complete ───────────────────────
+  const handleFsTrainingComplete = useCallback((data, skipped) => {
+    fsTrainingDataRef.current = data;
+    try {
+      saveFingerspellData(data, skipped || []);
+    } catch { /* ignore */ }
+    setFsLettersTrained(getTrainedLetters().length);
+    setScreen('fingerspell');
+  }, []);
 
   // ── Game complete ───────────────────────────────────────
   const handleGameComplete = useCallback((correct, rounds) => {
@@ -235,6 +272,7 @@ export default function App() {
           onModules={goModules}
           onSettings={goSettings}
           onMySigns={goMySigns}
+          onFingerspell={goFingerspell}
         />
       )}
 
@@ -296,6 +334,46 @@ export default function App() {
           total={total}
           onPlayAgain={activeModuleId ? () => goModuleGame(activeModuleId) : goGame}
           onHome={goWelcome}
+        />
+      )}
+
+      {screen === 'fingerspell' && (
+        <FingerspellScreen
+          mode={fsMode}
+          onSetMode={setFsMode}
+          fsLettersTrained={fsLettersTrained}
+          onGame={goFingerspellGame}
+          onCommunicate={goFingerspellComm}
+          onTrain={goFingerspellTraining}
+          onBack={goWelcome}
+        />
+      )}
+
+      {screen === 'fingerspell-training' && (
+        <FingerspellTraining
+          onComplete={handleFsTrainingComplete}
+          onBack={goFingerspell}
+        />
+      )}
+
+      {screen === 'fingerspell-game' && (
+        <FingerspellGame
+          mode={fsMode}
+          trainingData={fsTrainingDataRef.current}
+          onComplete={(correct, rounds) => {
+            setScore(correct);
+            setTotal(rounds);
+            setScreen('score');
+          }}
+          onExit={goFingerspell}
+        />
+      )}
+
+      {screen === 'fingerspell-comm' && (
+        <FingerspellComm
+          mode={fsMode}
+          trainingData={fsTrainingDataRef.current}
+          onExit={goFingerspell}
         />
       )}
     </div>

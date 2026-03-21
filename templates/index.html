@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>ISL Fingerspelling</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+<header>
+  <h1>&#9752; ISL Fingerspelling</h1>
+  <nav>
+    <button class="mode-btn active" data-mode="game">&#127918; Game</button>
+    <button class="mode-btn" data-mode="communicate">&#128172; Communicate</button>
+  </nav>
+</header>
+
+<main>
+  <!-- ─── Webcam ─────────────────────────────────── -->
+  <section class="webcam-section">
+    <div class="webcam-wrap">
+      <video id="webcam" autoplay playsinline muted></video>
+      <canvas id="overlay"></canvas>
+    </div>
+    <div class="detection-bar">
+      <div class="det-letter-wrap">
+        <span id="det-letter" class="big-letter">-</span>
+        <span id="det-conf" class="conf-text"></span>
+      </div>
+      <div id="hand-status" class="hand-ind off">
+        <span class="dot"></span><span class="htxt">No hand</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Panel ──────────────────────────────────── -->
+  <section class="panel-section">
+
+    <!-- Game -->
+    <div id="game-panel" class="panel">
+      <p class="panel-hint">Sign the Irish word using ISL. Remove your hand to submit.</p>
+      <div class="challenge-card" id="card">
+        <span id="ch-emoji" class="emoji">&#128054;</span>
+        <p id="ch-en" class="en-word">Dog</p>
+        <p class="ir-target">Spell: <strong id="ch-ir">Madra</strong></p>
+      </div>
+      <div class="input-area">
+        <label>Your spelling:</label>
+        <div id="game-tiles" class="tiles"></div>
+      </div>
+      <div id="game-result" class="result-banner hidden"></div>
+      <div class="game-footer">
+        <span class="score-lbl">Score: <b id="score">0</b> / <b id="total">0</b></span>
+        <div>
+          <button id="btn-skip" class="btn sec">Skip &#8594;</button>
+          <button id="btn-restart" class="btn sec">&#8634; Restart</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Communicate -->
+    <div id="comm-panel" class="panel hidden">
+      <p class="panel-hint">Spell words in ISL. Remove hand = end word. Hand away 5 s = end sentence.</p>
+      <div class="comm-block">
+        <label>Current word:</label>
+        <div id="comm-tiles" class="tiles"></div>
+      </div>
+      <div class="comm-block">
+        <label>Sentence:</label>
+        <div id="comm-chips" class="chips"></div>
+      </div>
+      <div id="trans-block" class="comm-block hidden">
+        <label>Irish:</label>
+        <div id="irish-out" class="irish-display"></div>
+        <button id="btn-speak" class="btn pri">&#128266; Say it in Irish</button>
+      </div>
+      <div id="countdown" class="countdown hidden"></div>
+      <button id="btn-clear" class="btn sec">&#128465; Clear</button>
+    </div>
+
+    <div id="model-warn" class="warn hidden">
+      &#9888;&#65039; No model loaded &mdash; place <code>best_model.pth</code> in <code>checkpoints/</code> and restart the server.
+    </div>
+  </section>
+
+  <!-- ─── Reference sidebar ─────────────────────── -->
+  <aside class="ref-sidebar">
+    <h2 class="ref-title">&#128292; ISL Alphabet</h2>
+    <img src="/static/isl_abcs.png" alt="ISL Alphabet Chart" class="ref-img">
+  </aside>
+
+</main>
+
+<footer id="bar">
+  <span id="conn">&#9679; Connecting&hellip;</span>
+  <button id="btn-debug" class="btn sec" style="padding:.2rem .8rem;font-size:.75rem">&#128248; Compare</button>
+  <span id="fps">0 fps</span>
+</footer>
+
+<!-- Debug comparison overlay -->
+<div id="debug-overlay" class="hidden">
+  <div class="debug-inner">
+    <div class="debug-header">
+      <h2>&#128269; Webcam vs Dataset</h2>
+      <button id="debug-close" class="close-btn">&#10005;</button>
+    </div>
+    <div class="debug-imgs">
+      <div class="debug-col">
+        <label>Your hand (processed for model)</label>
+        <img id="dbg-cam" alt="Processed webcam">
+      </div>
+      <div class="debug-col">
+        <label>Random dataset sample</label>
+        <img id="dbg-ds" alt="Dataset sample">
+      </div>
+    </div>
+    <p class="debug-hint">Both should look similar: grayscale hand on black background, 224×224.</p>
+  </div>
+</div>
+
+<canvas id="cap" style="display:none"></canvas>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.4/socket.io.min.js"></script>
+<script src="/static/js/app.js"></script>
+</body>
+</html>

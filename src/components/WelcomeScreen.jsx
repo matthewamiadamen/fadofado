@@ -15,6 +15,7 @@ export default function WelcomeScreen({
   onModules,
   onSettings,
   onMySigns,
+  onFingerspell,
 }) {
   const [proverb] = useState(() => getRandomProverb());
 
@@ -57,6 +58,10 @@ export default function WelcomeScreen({
               Cluiche — Play
             </button>
           )}
+
+          <button className="btn" onClick={onFingerspell} style={{ animationDelay: '0.2s' }}>
+            Litriú — Fingerspell
+          </button>
         </div>
 
         {trained && (

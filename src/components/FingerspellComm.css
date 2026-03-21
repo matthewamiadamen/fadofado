@@ -1,0 +1,258 @@
+/* ── Fingerspell Communicate ─────────────────────────────── */
+.fcomm {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  background: #000;
+}
+
+.fcomm-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 20px;
+  color: var(--cream);
+  font-size: 1.1rem;
+  text-align: center;
+}
+
+/* Full-viewport mirrored webcam */
+.fcomm-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scaleX(-1);
+  z-index: 0;
+}
+
+/* Canvas overlay for MediaPipe hand landmarks */
+.fcomm-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: scaleX(-1);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.fcomm-vignette {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 50%, rgba(0, 0, 0, 0.55) 100%);
+}
+
+/* ── Header ─────────────────────────────────────────────── */
+.fcomm-header {
+  position: absolute;
+  top: 20px;
+  left: 24px;
+  z-index: 10;
+}
+
+.fcomm-mode-label {
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  letter-spacing: 3px;
+  color: var(--cream-dim);
+}
+
+.fcomm-exit {
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  z-index: 10;
+  font-family: var(--font-display);
+  font-size: 0.65rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--cream-dim);
+  color: var(--cream-dim);
+  padding: 6px 14px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: border-color var(--transition), color var(--transition);
+}
+
+.fcomm-exit:hover {
+  border-color: var(--cream);
+  color: var(--cream);
+}
+
+/* Connection banner */
+.fcomm-status-banner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 20;
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  letter-spacing: 2px;
+  color: var(--gold);
+  background: rgba(10, 26, 15, 0.85);
+  border: 1px solid var(--gold-dim);
+  border-radius: var(--radius-pill);
+  padding: 14px 32px;
+  backdrop-filter: blur(4px);
+}
+
+/* ── Current detection ──────────────────────────────────── */
+.fcomm-detected {
+  position: absolute;
+  top: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  background: rgba(10, 26, 15, 0.7);
+  border: 1px solid var(--gold-dim);
+  border-radius: var(--radius-pill);
+  padding: 8px 24px;
+  backdrop-filter: blur(4px);
+}
+
+.fcomm-detected-letter {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  color: var(--gold);
+  letter-spacing: 2px;
+}
+
+.fcomm-detected-conf {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: var(--cream-dim);
+}
+
+/* ── Output panel ───────────────────────────────────────── */
+.fcomm-output {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  width: 90%;
+  max-width: 560px;
+  background: rgba(10, 26, 15, 0.82);
+  border: 1px solid var(--gold-dim);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  backdrop-filter: blur(6px);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.fcomm-sentence,
+.fcomm-word,
+.fcomm-translation {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.fcomm-sentence-label,
+.fcomm-word-label,
+.fcomm-translation-label {
+  font-family: var(--font-display);
+  font-size: 0.6rem;
+  letter-spacing: 2px;
+  color: var(--gold-dim);
+}
+
+.fcomm-sentence-text {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--cream);
+}
+
+.fcomm-word-text {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  color: var(--gold);
+  letter-spacing: 4px;
+  min-height: 1.6em;
+}
+
+.fcomm-placeholder {
+  color: var(--cream-dim);
+  font-style: italic;
+  letter-spacing: 1px;
+  font-size: 0.9rem;
+}
+
+.fcomm-translation-text {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 1.05rem;
+  color: var(--gold-light);
+}
+
+/* ── Action buttons ─────────────────────────────────────── */
+.fcomm-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.fcomm-action-btn {
+  font-family: var(--font-display);
+  font-size: 0.58rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--gold-dim);
+  color: var(--gold-dim);
+  padding: 6px 14px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: border-color var(--transition), color var(--transition);
+}
+
+.fcomm-action-btn:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.fcomm-action-speak {
+  border-color: var(--teal);
+  color: var(--teal);
+}
+
+.fcomm-action-speak:hover {
+  border-color: var(--teal);
+  color: var(--cream);
+  background: var(--teal);
+}
+
+/* ── Bottom bar ─────────────────────────────────────────── */
+.fcomm-bottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+}
+
+.fcomm-bar-track {
+  width: 100%;
+  height: 8px;
+  background: rgba(201, 168, 76, 0.12);
+}
+
+.fcomm-bar-fill {
+  height: 100%;
+  border-radius: 0 4px 4px 0;
+  transition: width 150ms ease, background 200ms ease;
+}

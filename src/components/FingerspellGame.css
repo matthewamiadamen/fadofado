@@ -1,0 +1,329 @@
+/* ── Fingerspell Game ────────────────────────────────────── */
+.fgame {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  background: #000;
+}
+
+.fgame-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 20px;
+  color: var(--cream);
+  font-size: 1.1rem;
+  text-align: center;
+}
+
+/* Full-viewport mirrored webcam */
+.fgame-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scaleX(-1);
+  z-index: 0;
+}
+
+/* Canvas overlay for MediaPipe hand landmarks */
+.fgame-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: scaleX(-1);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Dark vignette */
+.fgame-vignette {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 50%, rgba(0, 0, 0, 0.55) 100%);
+}
+
+/* Round counter */
+.fgame-round {
+  position: absolute;
+  top: 20px;
+  left: 24px;
+  z-index: 10;
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  letter-spacing: 2px;
+  color: var(--cream-dim);
+}
+
+/* Exit button */
+.fgame-exit {
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  z-index: 10;
+  font-family: var(--font-display);
+  font-size: 0.65rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--cream-dim);
+  color: var(--cream-dim);
+  padding: 6px 14px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: border-color var(--transition), color var(--transition);
+}
+
+.fgame-exit:hover {
+  border-color: var(--cream);
+  color: var(--cream);
+}
+
+/* Connection status banner */
+.fgame-status-banner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 20;
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  letter-spacing: 2px;
+  color: var(--gold);
+  background: rgba(10, 26, 15, 0.85);
+  border: 1px solid var(--gold-dim);
+  border-radius: var(--radius-pill);
+  padding: 14px 32px;
+  backdrop-filter: blur(4px);
+}
+
+/* ── Prompt pill ────────────────────────────────────────── */
+.fgame-prompt {
+  position: absolute;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  background: rgba(10, 26, 15, 0.75);
+  border: 1px solid var(--gold-dim);
+  border-radius: var(--radius-pill);
+  padding: 12px 36px;
+  backdrop-filter: blur(4px);
+}
+
+.fgame-prompt-top {
+  font-family: var(--font-display);
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--cream-dim);
+  letter-spacing: 3px;
+}
+
+.fgame-prompt-word {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  color: var(--gold);
+  letter-spacing: 3px;
+}
+
+.fgame-prompt-irish {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 0.85rem;
+  color: var(--cream);
+}
+
+/* ── Letter progress tiles ──────────────────────────────── */
+.fgame-letters {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  display: flex;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.fgame-letter {
+  width: 44px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  letter-spacing: 1px;
+  color: var(--cream-dim);
+  background: rgba(0, 0, 0, 0.45);
+  border: 2px solid var(--gold-dim);
+  border-radius: var(--radius);
+  backdrop-filter: blur(3px);
+  transition: all 200ms ease;
+}
+
+.fgame-letter-done {
+  color: var(--gold);
+  border-color: var(--gold);
+  background: rgba(201, 168, 76, 0.15);
+}
+
+.fgame-letter-active {
+  color: var(--cream);
+  border-color: var(--cream);
+  background: rgba(255, 255, 255, 0.1);
+  animation: letterPulse 1.2s ease infinite;
+}
+
+@keyframes letterPulse {
+  0%, 100% { border-color: var(--cream); }
+  50% { border-color: var(--gold); }
+}
+
+/* ── Current detection indicator ────────────────────────── */
+.fgame-detected {
+  position: absolute;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  background: rgba(10, 26, 15, 0.7);
+  border: 1px solid var(--gold-dim);
+  border-radius: var(--radius-pill);
+  padding: 8px 24px;
+  backdrop-filter: blur(4px);
+}
+
+.fgame-detected-letter {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  color: var(--gold);
+  letter-spacing: 2px;
+}
+
+.fgame-detected-conf {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: var(--cream-dim);
+}
+
+/* ── Flash overlay ──────────────────────────────────────── */
+.fgame-flash {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 20px 48px;
+  border-radius: 100px;
+  border: 1px solid rgba(201, 168, 76, 0.4);
+  pointer-events: none;
+  animation: flashPillIn 1200ms ease both;
+}
+
+.fgame-flash-skip {
+  border-color: rgba(192, 57, 43, 0.4);
+}
+
+.fgame-flash-emoji {
+  font-size: 2.5rem;
+}
+
+.fgame-flash-word {
+  font-family: var(--font-display);
+  font-size: clamp(36px, 10vw, 64px);
+  color: var(--gold);
+  letter-spacing: 4px;
+  text-shadow:
+    0 0 40px rgba(201, 168, 76, 0.9),
+    0 0 80px rgba(201, 168, 76, 0.6);
+}
+
+.fgame-flash-sub {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 1.1rem;
+  color: var(--cream);
+}
+
+@keyframes flashPillIn {
+  0%  { opacity: 0; transform: translate(-50%, -50%) scale(0.6); }
+  16% { opacity: 1; transform: translate(-50%, -50%) scale(1);   }
+  78% { opacity: 1; transform: translate(-50%, -50%) scale(1);   }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1.04); }
+}
+
+/* ── Bottom bar ─────────────────────────────────────────── */
+.fgame-bottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.fgame-bar-track {
+  width: 100%;
+  height: 10px;
+  background: rgba(201, 168, 76, 0.12);
+}
+
+.fgame-bar-fill {
+  height: 100%;
+  border-radius: 0 5px 5px 0;
+  transition: width 150ms ease, background 200ms ease;
+}
+
+.fgame-skip-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 8px 0 12px;
+}
+
+.fgame-skip-btn {
+  font-family: var(--font-display);
+  font-size: 0.6rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--gold-dim);
+  color: var(--gold-dim);
+  padding: 5px 16px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: border-color var(--transition), color var(--transition);
+}
+
+.fgame-skip-btn:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.fgame-score {
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  color: var(--cream-dim);
+}
