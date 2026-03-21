@@ -16,7 +16,6 @@ export default function SignCard({ sign, compact, showDetails }) {
       {/* Icon + verification badge */}
       <div className="sign-card-header">
         <span className="sign-card-icon">{sign.icon}</span>
-        {isWatchOnly && <span className="sign-card-badge sign-card-badge-watch">Watch &amp; Learn</span>}
         {isUnverified && <span className="sign-card-badge sign-card-badge-unverified">Unverified</span>}
       </div>
 
