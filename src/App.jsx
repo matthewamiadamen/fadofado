@@ -7,6 +7,7 @@ import AboutISL from './components/AboutISL';
 import ModuleSelect from './components/ModuleSelect';
 import ModuleDetail from './components/ModuleDetail';
 import SettingsPanel from './components/SettingsPanel';
+import MySignsScreen from './components/MySignsScreen';
 import { getModuleTrainableSigns, GESTURES } from './data/signs';
 import {
   loadGestures,
@@ -76,6 +77,7 @@ export default function App() {
   const goAbout = useCallback(() => setScreen('about'), []);
   const goModules = useCallback(() => setScreen('modules'), []);
   const goSettings = useCallback(() => setScreen('settings'), []);
+  const goMySigns = useCallback(() => setScreen('my-signs'), []);
 
   const goTraining = useCallback(() => {
     trainSignsRef.current = null;
@@ -228,18 +230,27 @@ export default function App() {
           storageError={storageError}
           onTrain={goTraining}
           onPlay={goGame}
-          onDeleteGesture={handleDeleteGesture}
           onClearAll={handleClearAll}
-          onExport={handleExport}
-          onImport={handleImport}
           onAbout={goAbout}
           onModules={goModules}
           onSettings={goSettings}
+          onMySigns={goMySigns}
         />
       )}
 
       {screen === 'about' && <AboutISL onBack={goWelcome} />}
       {screen === 'settings' && <SettingsPanel onBack={goWelcome} />}
+
+      {screen === 'my-signs' && (
+        <MySignsScreen
+          gestureSummary={gestureSummary}
+          onDeleteGesture={handleDeleteGesture}
+          onClearAll={handleClearAll}
+          onExport={handleExport}
+          onImport={handleImport}
+          onBack={goWelcome}
+        />
+      )}
 
       {screen === 'modules' && (
         <ModuleSelect

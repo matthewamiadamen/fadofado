@@ -1,0 +1,52 @@
+/* ── My Signs Screen ────────────────────────────────────── */
+.my-signs {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  position: relative;
+  z-index: 1;
+}
+
+.my-signs-content {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 32px 24px 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.my-signs-back {
+  align-self: flex-start;
+}
+
+.my-signs-title {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  color: var(--gold);
+  letter-spacing: 3px;
+  text-align: center;
+}
+
+.my-signs-subtitle {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 0.9rem;
+  color: var(--cream-dim);
+  margin-top: -10px;
+}
+
+.my-signs-divider {
+  width: 100px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+
+.my-signs-empty {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--cream-dim);
+  text-align: center;
+  padding: 40px 20px;
+}

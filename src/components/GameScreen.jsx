@@ -310,12 +310,15 @@ export default function GameScreen({ trainingData, skippedGestures, signsList, o
         ESC
       </button>
 
-      {/* Prompt pill — trilingual */}
+      {/* Prompt pill — Irish-first trilingual */}
       {currentGesture && (
         <div className="game-prompt">
-          {currentGesture.islGloss && <span className="game-prompt-gloss">{currentGesture.islGloss}</span>}
-          <span className="game-prompt-en">{currentGesture.en}</span>
-          <span className="game-prompt-ga">{currentGesture.ga}</span>
+          <span className="game-prompt-top">{(currentGesture.ga || currentGesture.en).toUpperCase()}</span>
+          <span className="game-prompt-main">{currentGesture.ga || currentGesture.en}</span>
+          {currentGesture.gaPhonetic && (
+            <span className="game-prompt-phonetic">/{currentGesture.gaPhonetic}/</span>
+          )}
+          <span className="game-prompt-secondary">{currentGesture.ga ? currentGesture.en : ''}</span>
         </div>
       )}
 

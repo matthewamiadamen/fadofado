@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { GESTURES } from '../data/signs';
 import { getRandomProverb } from '../data/seanfhocail';
-import GestureManager from './GestureManager';
 import SignCard from './SignCard';
 import './WelcomeScreen.css';
 
@@ -11,13 +10,11 @@ export default function WelcomeScreen({
   storageError,
   onTrain,
   onPlay,
-  onDeleteGesture,
   onClearAll,
-  onExport,
-  onImport,
   onAbout,
   onModules,
   onSettings,
+  onMySigns,
 }) {
   const [proverb] = useState(() => getRandomProverb());
 
@@ -70,6 +67,11 @@ export default function WelcomeScreen({
 
         {/* Secondary nav */}
         <div className="welcome-nav">
+          {gestureSummary.length > 0 && (
+            <button className="btn btn-small" onClick={onMySigns}>
+              Mo Chomhartha&iacute; ({gestureSummary.length})
+            </button>
+          )}
           <button className="btn btn-small" onClick={onAbout}>Faoin ISL</button>
           <button className="btn btn-small" onClick={onSettings}>Socruithe</button>
         </div>
@@ -82,14 +84,6 @@ export default function WelcomeScreen({
             </button>
           </div>
         )}
-
-        <GestureManager
-          gestureSummary={gestureSummary}
-          onDeleteGesture={onDeleteGesture}
-          onClearAll={onClearAll}
-          onExport={onExport}
-          onImport={onImport}
-        />
       </div>
     </div>
   );

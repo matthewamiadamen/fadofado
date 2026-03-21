@@ -102,23 +102,29 @@
   backdrop-filter: blur(4px);
 }
 
-.game-prompt-gloss {
-  font-family: 'Courier New', Courier, monospace;
+.game-prompt-top {
+  font-family: var(--font-display);
   font-size: 0.7rem;
   font-weight: 600;
-  color: var(--teal);
-  letter-spacing: 2px;
-  text-transform: uppercase;
+  color: var(--cream-dim);
+  letter-spacing: 3px;
 }
 
-.game-prompt-en {
+.game-prompt-main {
   font-family: var(--font-display);
   font-size: 1.4rem;
   color: var(--gold);
   letter-spacing: 3px;
 }
 
-.game-prompt-ga {
+.game-prompt-phonetic {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 0.75rem;
+  color: var(--cream-dim);
+}
+
+.game-prompt-secondary {
   font-family: var(--font-body);
   font-style: italic;
   font-size: 0.95rem;
