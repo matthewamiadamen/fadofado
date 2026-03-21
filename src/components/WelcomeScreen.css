@@ -1,0 +1,143 @@
+/* ── Welcome Screen ─────────────────────────────────────── */
+.welcome {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+}
+
+.welcome-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  padding: 40px;
+}
+
+/* Title with gold glow */
+.welcome-title {
+  font-family: var(--font-display);
+  font-size: clamp(2.8rem, 8vw, 5rem);
+  font-weight: 900;
+  color: var(--gold);
+  letter-spacing: 8px;
+  text-shadow: 0 0 40px rgba(201, 168, 76, 0.35), 0 0 80px rgba(201, 168, 76, 0.15);
+  text-align: center;
+}
+
+.welcome-subtitle {
+  font-family: var(--font-display);
+  font-size: clamp(1rem, 2.5vw, 1.35rem);
+  color: var(--gold-dim);
+  letter-spacing: 4px;
+  margin-top: -12px;
+}
+
+/* Thin gold divider */
+.welcome-divider {
+  width: 120px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  margin: 8px 0;
+}
+
+/* ── Gesture preview cards ──────────────────────────────── */
+.gesture-cards {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin: 8px 0;
+}
+
+.gesture-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  background: rgba(26, 58, 34, 0.6);
+  border: 1px solid var(--gold-dim);
+  border-radius: var(--radius);
+  padding: 20px 28px;
+  min-width: 120px;
+  transition: border-color var(--transition), transform var(--transition);
+}
+
+.gesture-card:hover {
+  border-color: var(--gold);
+  transform: translateY(-2px);
+}
+
+.gesture-card-icon {
+  font-size: 2rem;
+}
+
+.gesture-card-en {
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  color: var(--gold-light);
+  letter-spacing: 2px;
+}
+
+.gesture-card-ga {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 0.85rem;
+  color: var(--cream-dim);
+}
+
+/* ── Actions ────────────────────────────────────────────── */
+.welcome-actions {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.welcome-actions .btn {
+  animation: fadeInUp 400ms ease both;
+}
+
+/* ── Trained badge ──────────────────────────────────────── */
+.trained-badge {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--teal);
+  border: 1px solid var(--teal);
+  border-radius: var(--radius-pill);
+  padding: 8px 24px;
+  animation: fadeInUp 500ms ease both;
+}
+
+/* ── Storage error banner ──────────────────────────────── */
+.welcome-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  color: var(--red);
+  background: rgba(192, 57, 43, 0.1);
+  border: 1px solid var(--red);
+  border-radius: var(--radius);
+  padding: 12px 20px;
+  text-align: center;
+  max-width: 420px;
+  animation: fadeInUp 400ms ease both;
+}
+
+/* ── Animations ─────────────────────────────────────────── */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

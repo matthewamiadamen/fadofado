@@ -1,0 +1,238 @@
+/* ── Game Screen ────────────────────────────────────────── */
+.game {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  background: #000;
+}
+
+.game-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  color: var(--cream);
+  font-size: 1.1rem;
+  text-align: center;
+}
+
+/* Full-viewport mirrored webcam */
+.game-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scaleX(-1);
+  z-index: 0;
+}
+
+.game-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: scaleX(-1);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Dark vignette for depth */
+.game-vignette {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 50%, rgba(0, 0, 0, 0.55) 100%);
+}
+
+/* Round counter */
+.game-round {
+  position: absolute;
+  top: 20px;
+  left: 24px;
+  z-index: 10;
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  letter-spacing: 2px;
+  color: var(--cream-dim);
+}
+
+/* Exit button */
+.game-exit {
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  z-index: 10;
+  font-family: var(--font-display);
+  font-size: 0.65rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--cream-dim);
+  color: var(--cream-dim);
+  padding: 6px 14px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: border-color var(--transition), color var(--transition);
+}
+
+.game-exit:hover {
+  border-color: var(--cream);
+  color: var(--cream);
+}
+
+/* Prompt pill — top center */
+.game-prompt {
+  position: absolute;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  background: rgba(10, 26, 15, 0.75);
+  border: 1px solid var(--gold-dim);
+  border-radius: var(--radius-pill);
+  padding: 12px 36px;
+  backdrop-filter: blur(4px);
+}
+
+.game-prompt-en {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  color: var(--gold);
+  letter-spacing: 3px;
+}
+
+.game-prompt-ga {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 0.95rem;
+  color: var(--cream);
+}
+
+/* ── Flash pill on success ───────────────────────────────── */
+.game-flash-pill {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 16px 40px;
+  border-radius: 100px;
+  border: 1px solid rgba(201, 168, 76, 0.4);
+  pointer-events: none;
+  animation: flashPillIn 1800ms ease both;
+}
+
+.game-flash-ga {
+  font-family: var(--font-display);
+  font-size: clamp(64px, 15vw, 120px);
+  color: #c9a84c;
+  letter-spacing: 6px;
+  line-height: 1.1;
+  text-shadow:
+    0 0 40px rgba(201, 168, 76, 0.9),
+    0 0 80px rgba(201, 168, 76, 0.6),
+    0 0 120px rgba(201, 168, 76, 0.3);
+}
+
+.game-flash-en {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: clamp(18px, 3vw, 28px);
+  color: #f0e8d5;
+  letter-spacing: 2px;
+}
+
+@keyframes flashPillIn {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.6);
+  }
+  16% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  78% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.04);
+  }
+}
+
+/* ── Bottom overlay: bar + skip ─────────────────────────── */
+.game-bottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Confidence bar — full width */
+.game-bar-track {
+  width: 100%;
+  height: 10px;
+  background: rgba(201, 168, 76, 0.12);
+}
+
+.game-bar-fill {
+  height: 100%;
+  border-radius: 0 5px 5px 0;
+  transition: width 150ms ease, background 200ms ease;
+}
+
+/* Skip row */
+.game-skip-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0 12px;
+}
+
+.game-skip-btn {
+  font-family: var(--font-display);
+  font-size: 0.6rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--gold-dim);
+  color: var(--gold-dim);
+  padding: 5px 16px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: border-color var(--transition), color var(--transition);
+}
+
+.game-skip-btn:hover:not(:disabled) {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.game-skip-disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.game-skip-counter {
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  color: var(--cream-dim);
+}

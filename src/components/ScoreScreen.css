@@ -1,0 +1,68 @@
+/* ── Score Screen ───────────────────────────────────────── */
+.score {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+}
+
+.score-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 40px;
+  animation: fadeInUp 500ms ease both;
+}
+
+.score-label-top {
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  letter-spacing: 6px;
+  color: var(--cream-dim);
+  text-transform: uppercase;
+}
+
+.score-count {
+  font-family: var(--font-display);
+  font-size: clamp(4rem, 12vw, 7rem);
+  font-weight: 900;
+  color: var(--gold);
+  text-shadow: 0 0 40px rgba(201, 168, 76, 0.3);
+  line-height: 1;
+}
+
+.score-slash {
+  color: var(--gold-dim);
+  font-weight: 400;
+}
+
+.score-result {
+  font-family: var(--font-body);
+  font-size: 1.4rem;
+  font-style: italic;
+  color: var(--cream);
+  text-align: center;
+}
+
+.score-actions {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 12px;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

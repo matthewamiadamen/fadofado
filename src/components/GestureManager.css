@@ -1,0 +1,113 @@
+/* ── Gesture Manager ────────────────────────────────────── */
+.gm {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 420px;
+  animation: fadeInUp 400ms ease both;
+}
+
+.gm-title {
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--cream-dim);
+}
+
+/* ── Gesture list ──────────────────────────────────────── */
+.gm-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.gm-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(26, 58, 34, 0.5);
+  border: 1px solid var(--gold-dim);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  transition: border-color var(--transition);
+}
+
+.gm-item:hover {
+  border-color: var(--gold);
+}
+
+.gm-item-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.gm-item-icon {
+  font-size: 1.3rem;
+}
+
+.gm-item-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.gm-item-name {
+  font-family: var(--font-display);
+  font-size: 0.82rem;
+  color: var(--gold-light);
+  letter-spacing: 1.5px;
+}
+
+.gm-item-ga {
+  font-family: var(--font-body);
+  font-style: italic;
+  color: var(--cream-dim);
+  margin-left: 8px;
+  font-size: 0.78rem;
+  letter-spacing: 0;
+}
+
+.gm-item-meta {
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  color: var(--cream-dim);
+}
+
+.gm-delete {
+  background: none;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  color: var(--cream-dim);
+  font-size: 1.2rem;
+  padding: 2px 8px;
+  cursor: pointer;
+  transition: color var(--transition), border-color var(--transition);
+}
+
+.gm-delete:hover {
+  color: var(--red);
+  border-color: var(--red);
+}
+
+/* ── Actions row ───────────────────────────────────────── */
+.gm-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.gm-clear {
+  border-color: var(--red) !important;
+  color: var(--red) !important;
+}
+
+.gm-clear:hover {
+  background: var(--red) !important;
+  color: #fff !important;
+}
