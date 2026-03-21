@@ -1,0 +1,140 @@
+/* ── About ISL ─────────────────────────────────────────── */
+.about-isl {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  position: relative;
+  z-index: 1;
+}
+
+.about-isl-content {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 32px 24px 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.about-isl-back {
+  align-self: flex-start;
+}
+
+.about-isl-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 5vw, 2.6rem);
+  color: var(--gold);
+  letter-spacing: 4px;
+  text-align: center;
+}
+
+.about-isl-subtitle {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 1rem;
+  color: var(--cream-dim);
+  margin-top: -10px;
+}
+
+.about-isl-divider {
+  width: 120px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  margin: 8px 0;
+}
+
+/* ── Sections ──────────────────────────────────────────── */
+.about-section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.about-heading {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  color: var(--gold-light);
+  letter-spacing: 2px;
+  margin-top: 8px;
+}
+
+.about-section p {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--cream);
+  line-height: 1.75;
+}
+
+/* ── ISL Gloss examples ────────────────────────────────── */
+.about-gloss-examples {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: rgba(26, 58, 34, 0.6);
+  border: 1px solid var(--gold-dim);
+  border-radius: var(--radius);
+  padding: 16px;
+}
+
+.about-gloss-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.about-gloss-isl {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--teal);
+  letter-spacing: 1.5px;
+}
+
+.about-gloss-en {
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  color: var(--cream);
+}
+
+.about-gloss-note {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 0.75rem;
+  color: var(--cream-dim);
+}
+
+/* ── Etiquette list ────────────────────────────────────── */
+.about-etiquette {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.about-etiquette li {
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  color: var(--cream);
+  line-height: 1.65;
+  padding-left: 20px;
+  position: relative;
+}
+
+.about-etiquette li::before {
+  content: '◆';
+  position: absolute;
+  left: 0;
+  color: var(--gold-dim);
+  font-size: 0.6rem;
+  top: 5px;
+}
+
+.about-footer {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--cream-dim);
+  text-align: center;
+  line-height: 1.7;
+}

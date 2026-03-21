@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { GESTURES } from '../gestures';
+import { getAllSigns } from '../data/signs';
 import './GestureManager.css';
 
 /**
@@ -14,10 +14,10 @@ export default function GestureManager({
 }) {
   const fileInputRef = useRef(null);
 
-  // Map gesture ids to their display names
-  const gestureMap = {};
-  for (const g of GESTURES) {
-    gestureMap[g.id] = g;
+  // Map sign ids to their display names
+  const signMap = {};
+  for (const g of getAllSigns()) {
+    signMap[g.id] = g;
   }
 
   const handleImportClick = () => fileInputRef.current?.click();
@@ -48,7 +48,7 @@ export default function GestureManager({
 
       <div className="gm-list">
         {gestureSummary.map((g) => {
-          const info = gestureMap[g.id];
+          const info = signMap[g.id];
           return (
             <div className="gm-item" key={g.id}>
               <div className="gm-item-info">

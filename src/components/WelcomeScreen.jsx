@@ -1,5 +1,8 @@
-import { GESTURES } from '../gestures';
+import { useState } from 'react';
+import { GESTURES } from '../data/signs';
+import { getRandomProverb } from '../data/seanfhocail';
 import GestureManager from './GestureManager';
+import SignCard from './SignCard';
 import './WelcomeScreen.css';
 
 export default function WelcomeScreen({
@@ -12,7 +15,15 @@ export default function WelcomeScreen({
   onClearAll,
   onExport,
   onImport,
+  onAbout,
+  onModules,
+  onSettings,
 }) {
+  const [proverb] = useState(() => getRandomProverb());
+
+  // Show a small subset of signs as preview cards
+  const previewSigns = GESTURES.slice(0, 4);
+
   return (
     <div className="welcome radial-bg">
       <div className="welcome-content">
@@ -21,33 +32,47 @@ export default function WelcomeScreen({
 
         <div className="welcome-divider" />
 
+        {/* Seanfhocal */}
+        <div className="welcome-proverb">
+          <span className="proverb-ga">&ldquo;{proverb.ga}&rdquo;</span>
+          <span className="proverb-en">{proverb.en}</span>
+        </div>
+
+        {/* Sign preview cards — trilingual */}
         <div className="gesture-cards">
-          {GESTURES.map((g) => (
-            <div className="gesture-card" key={g.id}>
-              <span className="gesture-card-icon">{g.icon}</span>
-              <span className="gesture-card-en">{g.en}</span>
-              <span className="gesture-card-ga">{g.ga}</span>
-            </div>
+          {previewSigns.map((sign) => (
+            <SignCard key={sign.id} sign={sign} compact />
           ))}
         </div>
 
+        {/* Main actions */}
         <div className="welcome-actions">
+          <button className="btn btn-primary" onClick={onModules}>
+            Foghlaim — Learn
+          </button>
+
           <button className="btn btn-primary" onClick={onTrain}>
-            {trained ? 'Retrain Gestures' : 'Train Gestures'}
+            {trained ? 'Retrain Signs' : 'Train Signs'}
           </button>
 
           {trained && (
             <button className="btn" onClick={onPlay} style={{ animationDelay: '0.1s' }}>
-              Play Game
+              Cluiche — Play
             </button>
           )}
         </div>
 
         {trained && (
           <div className="trained-badge">
-            Gestures trained &mdash; ready to battle
+            Signs trained &mdash; ready to battle
           </div>
         )}
+
+        {/* Secondary nav */}
+        <div className="welcome-nav">
+          <button className="btn btn-small" onClick={onAbout}>Faoin ISL</button>
+          <button className="btn btn-small" onClick={onSettings}>Socruithe</button>
+        </div>
 
         {storageError && (
           <div className="welcome-error">

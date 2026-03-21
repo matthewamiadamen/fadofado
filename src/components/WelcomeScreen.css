@@ -7,20 +7,21 @@
   justify-content: center;
   position: relative;
   z-index: 1;
+  overflow-y: auto;
 }
 
 .welcome-content {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 24px;
-  padding: 40px;
+  gap: 20px;
+  padding: 32px 24px 48px;
 }
 
 /* Title with gold glow */
 .welcome-title {
   font-family: var(--font-display);
-  font-size: clamp(2.8rem, 8vw, 5rem);
+  font-size: clamp(2.4rem, 8vw, 4.5rem);
   font-weight: 900;
   color: var(--gold);
   letter-spacing: 8px;
@@ -41,75 +42,70 @@
   width: 120px;
   height: 1px;
   background: linear-gradient(90deg, transparent, var(--gold), transparent);
-  margin: 8px 0;
+  margin: 4px 0;
 }
 
-/* ── Gesture preview cards ──────────────────────────────── */
-.gesture-cards {
-  display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin: 8px 0;
-}
-
-.gesture-card {
+/* ── Proverb ───────────────────────────────────────────── */
+.welcome-proverb {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
-  background: rgba(26, 58, 34, 0.6);
-  border: 1px solid var(--gold-dim);
-  border-radius: var(--radius);
-  padding: 20px 28px;
-  min-width: 120px;
-  transition: border-color var(--transition), transform var(--transition);
+  gap: 4px;
+  max-width: 400px;
+  text-align: center;
 }
 
-.gesture-card:hover {
-  border-color: var(--gold);
-  transform: translateY(-2px);
-}
-
-.gesture-card-icon {
-  font-size: 2rem;
-}
-
-.gesture-card-en {
-  font-family: var(--font-display);
-  font-size: 0.9rem;
-  color: var(--gold-light);
-  letter-spacing: 2px;
-}
-
-.gesture-card-ga {
+.welcome-proverb .proverb-ga {
   font-family: var(--font-body);
   font-style: italic;
-  font-size: 0.85rem;
+  font-size: 0.95rem;
+  color: var(--gold-light);
+}
+
+.welcome-proverb .proverb-en {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
   color: var(--cream-dim);
+}
+
+/* ── Sign preview cards ────────────────────────────────── */
+.gesture-cards {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin: 4px 0;
 }
 
 /* ── Actions ────────────────────────────────────────────── */
 .welcome-actions {
   display: flex;
-  gap: 16px;
+  gap: 12px;
   flex-wrap: wrap;
   justify-content: center;
-  margin-top: 8px;
+  margin-top: 4px;
 }
 
 .welcome-actions .btn {
   animation: fadeInUp 400ms ease both;
 }
 
+/* ── Secondary nav ─────────────────────────────────────── */
+.welcome-nav {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
 /* ── Trained badge ──────────────────────────────────────── */
 .trained-badge {
   font-family: var(--font-body);
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   color: var(--teal);
   border: 1px solid var(--teal);
   border-radius: var(--radius-pill);
-  padding: 8px 24px;
+  padding: 6px 20px;
   animation: fadeInUp 500ms ease both;
 }
 

@@ -1,0 +1,121 @@
+/* ── Module Detail ──────────────────────────────────────── */
+.mod-detail {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  position: relative;
+  z-index: 1;
+}
+
+.mod-detail-content {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 32px 24px 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.mod-detail-back {
+  align-self: flex-start;
+}
+
+.mod-detail-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.mod-detail-icon {
+  font-size: 2rem;
+}
+
+.mod-detail-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 4vw, 2rem);
+  color: var(--gold);
+  letter-spacing: 3px;
+  text-align: center;
+}
+
+.mod-detail-subtitle {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 0.9rem;
+  color: var(--cream-dim);
+}
+
+.mod-detail-proverb {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 0.88rem;
+  color: var(--gold-light);
+  text-align: center;
+  max-width: 400px;
+}
+
+.mod-detail-divider {
+  width: 80px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
+  margin: 4px 0;
+}
+
+/* ── Phase sections ────────────────────────────────────── */
+.mod-phase {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.mod-phase-title {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  color: var(--gold-light);
+  letter-spacing: 2px;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.mod-phase-ga {
+  color: var(--gold);
+  font-size: 1.1rem;
+}
+
+.mod-phase-desc {
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  color: var(--cream);
+  text-align: center;
+  max-width: 480px;
+  line-height: 1.5;
+}
+
+.mod-phase-note {
+  color: var(--cream-dim);
+  font-style: italic;
+  font-size: 0.8rem;
+}
+
+/* ── Sign grid ─────────────────────────────────────────── */
+.mod-sign-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  width: 100%;
+}
+
+.mod-sign-item {
+  cursor: pointer;
+  transition: transform var(--transition);
+}
+
+.mod-sign-item:hover {
+  transform: scale(1.02);
+}

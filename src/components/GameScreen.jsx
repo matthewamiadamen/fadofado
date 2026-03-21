@@ -4,6 +4,8 @@ import { Camera } from '@mediapipe/camera_utils';
 import { extractFeatures, extractFeaturesTwoHands } from '../utils/featureExtraction';
 import { knnPredict } from '../utils/knnClassifier';
 import { GESTURES } from '../gestures';
+import { useSettings } from '../contexts/SettingsContext';
+import { SignLabel } from './SignCard';
 import './GameScreen.css';
 
 const TOTAL_ROUNDS = 5;
@@ -12,9 +14,9 @@ const CONFIDENCE_THRESHOLD = 0.65;
 const ROUND_PAUSE_MS = 2000;
 const MAX_SKIPS = 2;
 
-// Build rounds from available (non-skipped) gestures
-function shuffleRounds(skippedGestures) {
-  const available = GESTURES.filter((g) => !skippedGestures.includes(g.id));
+// Build rounds from available (non-skipped) signs
+function shuffleRounds(signsList, skippedGestures) {
+  const available = signsList.filter((g) => !skippedGestures.includes(g.id));
   if (available.length === 0) return [];
   const pool = [];
   while (pool.length < TOTAL_ROUNDS) {
@@ -34,8 +36,11 @@ const HAND_CONNECTIONS = [
   [5,9],[9,13],[13,17],
 ];
 
-export default function GameScreen({ trainingData, skippedGestures, onComplete, onExit }) {
-  const [rounds] = useState(() => shuffleRounds(skippedGestures || []));
+export default function GameScreen({ trainingData, skippedGestures, signsList, onComplete, onExit }) {
+  const signs = signsList || GESTURES;
+  const { settings } = useSettings();
+  const mirrorX = settings.dominantHand === 'left';
+  const [rounds] = useState(() => shuffleRounds(signs, skippedGestures || []));
   const [roundIdx, setRoundIdx] = useState(0);
   const [confidence, setConfidence] = useState(0);
   const [matched, setMatched] = useState(false);
@@ -54,6 +59,9 @@ export default function GameScreen({ trainingData, skippedGestures, onComplete, 
   const pausedRef = useRef(false);
   const completedRef = useRef(false);
   const mountedRef = useRef(false);
+
+  const mirrorXRef = useRef(mirrorX);
+  useEffect(() => { mirrorXRef.current = mirrorX; }, [mirrorX]);
 
   // Store trainingData in a ref so the onResults closure always reads the
   // current value, not a stale snapshot from the initial render.
@@ -150,14 +158,14 @@ export default function GameScreen({ trainingData, skippedGestures, onComplete, 
         // Extract features matching the gesture type
         let features;
         if (targetGesture.twoHanded) {
-          features = extractFeaturesTwoHands(results.multiHandLandmarks);
+          features = extractFeaturesTwoHands(results.multiHandLandmarks, mirrorXRef.current);
           if (!features) {
             setConfidence(0);
             holdStartRef.current = null;
             return;
           }
         } else {
-          features = extractFeatures(results.multiHandLandmarks);
+          features = extractFeatures(results.multiHandLandmarks, mirrorXRef.current);
         }
 
         // Check 5: read training data from ref, not stale closure prop
@@ -302,9 +310,10 @@ export default function GameScreen({ trainingData, skippedGestures, onComplete, 
         ESC
       </button>
 
-      {/* Prompt pill */}
+      {/* Prompt pill — trilingual */}
       {currentGesture && (
         <div className="game-prompt">
+          {currentGesture.islGloss && <span className="game-prompt-gloss">{currentGesture.islGloss}</span>}
           <span className="game-prompt-en">{currentGesture.en}</span>
           <span className="game-prompt-ga">{currentGesture.ga}</span>
         </div>

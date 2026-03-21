@@ -5,6 +5,8 @@ import { extractFeatures, extractFeaturesTwoHands } from '../utils/featureExtrac
 import { euclidean } from '../utils/knnClassifier';
 import { knnPredict } from '../utils/knnClassifier';
 import { GESTURES } from '../gestures';
+import { useSettings } from '../contexts/SettingsContext';
+import { SignLabel } from './SignCard';
 import GestureAnimation from './GestureAnimation';
 import './TrainingScreen.css';
 
@@ -71,7 +73,10 @@ function separationCheck(newBatch, existingData) {
 
 // ───────────────────────────────────────────────────────────────────────
 
-export default function TrainingScreen({ trainingDataRef, existingGestures = [], onComplete, onBack }) {
+export default function TrainingScreen({ trainingDataRef, existingGestures = [], signsList, onComplete, onBack }) {
+  const signs = signsList || GESTURES;
+  const { settings } = useSettings();
+  const mirrorX = settings.dominantHand === 'left';
   const [gestureIdx, setGestureIdx] = useState(0);
   const [samplesCollected, setSamplesCollected] = useState(0);
   const [recording, setRecording] = useState(false);
@@ -97,8 +102,12 @@ export default function TrainingScreen({ trainingDataRef, existingGestures = [],
   const batchRef = useRef([]); // samples for current gesture only
   const runningMeanRef = useRef(null);
   const sepFailCountRef = useRef(0); // consecutive separation failures for current gesture
+  const signsRef = useRef(signs);
+  useEffect(() => { signsRef.current = signs; }, [signs]);
+  const mirrorXRef = useRef(mirrorX);
+  useEffect(() => { mirrorXRef.current = mirrorX; }, [mirrorX]);
 
-  const gesture = GESTURES[gestureIdx];
+  const gesture = signs[gestureIdx];
   const needsTwoHands = gesture.twoHanded;
 
   // Keep refs in sync
@@ -259,7 +268,7 @@ export default function TrainingScreen({ trainingDataRef, existingGestures = [],
 
     // Advance after 800ms
     const nextIdx = gestureIdxRef.current + 1;
-    if (nextIdx >= GESTURES.length) {
+    if (nextIdx >= signs.length) {
       setTimeout(() => {
         onCompleteRef.current(collectedRef.current, skippedGesturesRef.current);
       }, 800);
@@ -289,14 +298,14 @@ export default function TrainingScreen({ trainingDataRef, existingGestures = [],
     intervalRef.current = setInterval(() => {
       if (!landmarksRef.current) return;
 
-      const currentGesture = GESTURES[gestureIdxRef.current];
+      const currentGesture = signsRef.current[gestureIdxRef.current];
       let features;
 
       if (currentGesture.twoHanded) {
-        features = extractFeaturesTwoHands(landmarksRef.current);
+        features = extractFeaturesTwoHands(landmarksRef.current, mirrorXRef.current);
         if (!features) return; // need both hands — skip this tick
       } else {
-        features = extractFeatures(landmarksRef.current);
+        features = extractFeatures(landmarksRef.current, mirrorXRef.current);
       }
 
       // Live steadiness: distance from running mean
@@ -354,7 +363,7 @@ export default function TrainingScreen({ trainingDataRef, existingGestures = [],
   const handleSkip = useCallback(() => {
     cancelRecording();
     sepFailCountRef.current = 0;
-    const currentId = GESTURES[gestureIdxRef.current].id;
+    const currentId = signsRef.current[gestureIdxRef.current].id;
 
     // Only truly skip (exclude from game) if no existing saved data
     let updated = skippedGesturesRef.current;
@@ -366,7 +375,7 @@ export default function TrainingScreen({ trainingDataRef, existingGestures = [],
     setFeedback(null);
 
     const nextIdx = gestureIdxRef.current + 1;
-    if (nextIdx >= GESTURES.length) {
+    if (nextIdx >= signs.length) {
       onCompleteRef.current(collectedRef.current, updated);
     } else {
       gestureIdxRef.current = nextIdx;
@@ -411,11 +420,10 @@ export default function TrainingScreen({ trainingDataRef, existingGestures = [],
       <div className="training-content">
         {/* Step indicator */}
         <div className="training-step">
-          GESTURE {gestureIdx + 1} OF {GESTURES.length}
+          SIGN {gestureIdx + 1} OF {signs.length}
         </div>
 
-        <h2 className="training-gesture-name">{gesture.en}</h2>
-        <p className="training-gesture-ga">{gesture.ga}</p>
+        <SignLabel sign={gesture} />
 
         <div className="training-split">
           {/* Instruction card with animated illustration */}

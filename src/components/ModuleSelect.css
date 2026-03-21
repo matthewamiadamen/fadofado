@@ -1,0 +1,168 @@
+/* ── Module Select ──────────────────────────────────────── */
+.module-select {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  position: relative;
+  z-index: 1;
+}
+
+.module-select-content {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 32px 24px 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.module-select-back {
+  align-self: flex-start;
+}
+
+.module-select-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 5vw, 2.2rem);
+  color: var(--gold);
+  letter-spacing: 4px;
+}
+
+.module-select-subtitle {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 0.95rem;
+  color: var(--cream-dim);
+  margin-top: -10px;
+}
+
+.module-select-divider {
+  width: 100px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+
+/* ── Proverb ───────────────────────────────────────────── */
+.module-select-proverb {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 20px;
+  max-width: 400px;
+  text-align: center;
+}
+
+.proverb-ga {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 0.95rem;
+  color: var(--gold-light);
+}
+
+.proverb-en {
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  color: var(--cream-dim);
+}
+
+/* ── Module cards ──────────────────────────────────────── */
+.module-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+}
+
+.module-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: rgba(26, 58, 34, 0.5);
+  border: 1px solid var(--gold-dim);
+  border-radius: var(--radius);
+  padding: 20px;
+  cursor: pointer;
+  transition: border-color var(--transition), transform var(--transition);
+  text-align: left;
+  width: 100%;
+  font-family: inherit;
+  color: inherit;
+}
+
+.module-card:hover:not(:disabled) {
+  border-color: var(--gold);
+  transform: translateY(-2px);
+}
+
+.module-card-locked {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.module-card-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.module-card-icon {
+  font-size: 1.8rem;
+}
+
+.module-card-titles {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.module-card-ga {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  color: var(--gold-light);
+  letter-spacing: 2px;
+}
+
+.module-card-en {
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  color: var(--cream-dim);
+}
+
+.module-card-desc {
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  color: var(--cream);
+  line-height: 1.5;
+}
+
+.module-card-stats {
+  display: flex;
+  gap: 6px;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  color: var(--cream-dim);
+}
+
+.module-card-lock {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  color: #d4a017;
+  font-style: italic;
+}
+
+/* ── Progress bar ──────────────────────────────────────── */
+.module-progress-track {
+  width: 100%;
+  height: 6px;
+  background: rgba(201, 168, 76, 0.12);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.module-progress-fill {
+  height: 100%;
+  background: var(--gold);
+  border-radius: 3px;
+  transition: width 300ms ease;
+}

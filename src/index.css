@@ -18,6 +18,8 @@
   --cream-dim: #9a8f79;
   --red: #c0392b;
   --teal: #1d9e75;
+  --slate-blue: #4a6274;
+  --orange-accent: #d4833b;
   --radius: 8px;
   --radius-pill: 100px;
   --transition: 200ms ease;
@@ -40,16 +42,32 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* ── Celtic background pattern (subtle grid) ───────────── */
+/* ── Celtic knotwork-inspired background pattern ─────────── */
 .celtic-bg {
   position: fixed;
   inset: 0;
   z-index: 0;
   pointer-events: none;
   background-image:
-    linear-gradient(rgba(201, 168, 76, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(201, 168, 76, 0.04) 1px, transparent 1px);
-  background-size: 40px 40px;
+    /* Diagonal interlace lines */
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 38px,
+      rgba(201, 168, 76, 0.025) 38px,
+      rgba(201, 168, 76, 0.025) 40px
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 38px,
+      rgba(201, 168, 76, 0.025) 38px,
+      rgba(201, 168, 76, 0.025) 40px
+    ),
+    /* Subtle grid underneath */
+    linear-gradient(rgba(201, 168, 76, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(201, 168, 76, 0.03) 1px, transparent 1px);
+  background-size: 56px 56px, 56px 56px, 40px 40px, 40px 40px;
 }
 
 /* ── Radial gradient backdrop used on welcome & score ──── */
@@ -60,14 +78,14 @@ body {
 /* ── Shared button styles ──────────────────────────────── */
 .btn {
   font-family: var(--font-display);
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   letter-spacing: 3px;
   text-transform: uppercase;
   border: 2px solid var(--gold);
   border-radius: var(--radius);
   background: transparent;
   color: var(--gold);
-  padding: 14px 36px;
+  padding: 12px 28px;
   cursor: pointer;
   transition: background var(--transition), color var(--transition), transform var(--transition);
   outline: none;
@@ -83,6 +101,12 @@ body {
   transform: translateY(0);
 }
 
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
 .btn-primary {
   background: var(--gold);
   color: var(--green-dark);
@@ -94,6 +118,18 @@ body {
 
 .btn-small {
   font-size: 0.7rem;
-  padding: 8px 20px;
+  padding: 8px 18px;
   letter-spacing: 2px;
+}
+
+/* ── Shared proverb styles ─────────────────────────────── */
+.proverb-ga {
+  font-family: var(--font-body);
+  font-style: italic;
+  color: var(--gold-light);
+}
+
+.proverb-en {
+  font-family: var(--font-body);
+  color: var(--cream-dim);
 }
