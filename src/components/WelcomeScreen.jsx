@@ -24,8 +24,8 @@ export default function WelcomeScreen({
   return (
     <div className="welcome radial-bg">
       <div className="welcome-content">
-        <h1 className="welcome-title">SIGN BATTLE</h1>
-        <p className="welcome-subtitle">Cath Comharthaíochta</p>
+        <h1 className="welcome-title">LÁMHA</h1>
+        <p className="welcome-subtitle">Learn Irish Sign Language</p>
 
         <div className="welcome-divider" />
 
