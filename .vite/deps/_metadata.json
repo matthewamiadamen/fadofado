@@ -1,0 +1,40 @@
+{
+  "hash": "43890dec",
+  "configHash": "f73cf5c8",
+  "lockfileHash": "c1835e14",
+  "browserHash": "6c0ec9a5",
+  "optimized": {
+    "react": {
+      "src": "../../node_modules/react/index.js",
+      "file": "react.js",
+      "fileHash": "5859e52c",
+      "needsInterop": true
+    },
+    "react-dom/client": {
+      "src": "../../node_modules/react-dom/client.js",
+      "file": "react-dom_client.js",
+      "fileHash": "01a87a4a",
+      "needsInterop": true
+    },
+    "@mediapipe/hands": {
+      "src": "../../node_modules/@mediapipe/hands/hands.js",
+      "file": "@mediapipe_hands.js",
+      "fileHash": "1b47b91a",
+      "needsInterop": true
+    },
+    "@mediapipe/camera_utils": {
+      "src": "../../node_modules/@mediapipe/camera_utils/camera_utils.js",
+      "file": "@mediapipe_camera_utils.js",
+      "fileHash": "ee44ab1a",
+      "needsInterop": true
+    }
+  },
+  "chunks": {
+    "chunk-JCH2SJW3": {
+      "file": "chunk-JCH2SJW3.js"
+    },
+    "chunk-BUSYA2B4": {
+      "file": "chunk-BUSYA2B4.js"
+    }
+  }
+}
