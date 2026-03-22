@@ -1,6 +1,4 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { Hands } from '@mediapipe/hands';
-import { Camera } from '@mediapipe/camera_utils';
 import { extractFeatures } from '../utils/featureExtraction';
 import { euclidean, knnPredict } from '../utils/knnClassifier';
 import { FINGERSPELL_SIGNS } from '../data/fingerspellSigns';
@@ -132,8 +130,8 @@ export default function FingerspellTraining({ onComplete, onBack }) {
     if (!video) return;
 
     try {
-      const hands = new Hands({
-        locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/${file}`,
+      const hands = new window.Hands({
+        locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`,
       });
       hands.setOptions({
         maxNumHands: 1,
@@ -144,7 +142,7 @@ export default function FingerspellTraining({ onComplete, onBack }) {
       hands.onResults((r) => { if (onResultsRef.current) onResultsRef.current(r); });
       handsRef.current = hands;
 
-      const camera = new Camera(video, {
+      const camera = new window.Camera(video, {
         onFrame: async () => {
           if (!mountedRef.current) return;
           try { if (handsRef.current) await handsRef.current.send({ image: video }); } catch {}

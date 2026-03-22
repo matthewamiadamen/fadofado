@@ -1,6 +1,4 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { Hands } from '@mediapipe/hands';
-import { Camera } from '@mediapipe/camera_utils';
 import { extractFeatures, extractFeaturesTwoHands } from '../utils/featureExtraction';
 import { euclidean } from '../utils/knnClassifier';
 import { knnPredict } from '../utils/knnClassifier';
@@ -177,8 +175,8 @@ export default function TrainingScreen({ trainingDataRef, existingGestures = [],
     if (!video) return;
 
     try {
-      const hands = new Hands({
-        locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/${file}`,
+      const hands = new window.Hands({
+        locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`,
       });
       hands.setOptions({
         maxNumHands: 2,
@@ -191,7 +189,7 @@ export default function TrainingScreen({ trainingDataRef, existingGestures = [],
       });
       handsRef.current = hands;
 
-      const camera = new Camera(video, {
+      const camera = new window.Camera(video, {
         onFrame: async () => {
           if (!mountedRef.current) return;
           try {
