@@ -77,11 +77,22 @@ export default function FingerspellTraining({ onComplete, onBack }) {
   const sepFailCountRef = useRef(0);
   const mountedRef = useRef(false);
 
-  const gesture = FINGERSPELL_SIGNS[gestureIdx];
+  const gesture = FINGERSPELL_SIGNS[gestureIdx] || null;
 
   useEffect(() => { gestureIdxRef.current = gestureIdx; }, [gestureIdx]);
   useEffect(() => { skippedGesturesRef.current = skippedGestures; }, [skippedGestures]);
   useEffect(() => { onCompleteRef.current = onComplete; }, [onComplete]);
+
+  if (!FINGERSPELL_SIGNS || FINGERSPELL_SIGNS.length === 0 || !gesture) {
+    return (
+      <div className="training radial-bg">
+        <div className="training-error">
+          <p>No fingerspelling letters are available right now.</p>
+          <button className="btn" onClick={onBack}>Back</button>
+        </div>
+      </div>
+    );
+  }
 
   const drawLandmarks = useCallback((allHands, width, height) => {
     const canvas = canvasRef.current;
@@ -131,30 +142,34 @@ export default function FingerspellTraining({ onComplete, onBack }) {
     const video = videoRef.current;
     if (!video) return;
 
-    const hands = new Hands({
-      locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`,
-    });
-    hands.setOptions({
-      maxNumHands: 1,
-      modelComplexity: 1,
-      minDetectionConfidence: 0.6,
-      minTrackingConfidence: 0.5,
-    });
-    hands.onResults((r) => { if (onResultsRef.current) onResultsRef.current(r); });
-    handsRef.current = hands;
+    try {
+      const hands = new Hands({
+        locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`,
+      });
+      hands.setOptions({
+        maxNumHands: 1,
+        modelComplexity: 1,
+        minDetectionConfidence: 0.6,
+        minTrackingConfidence: 0.5,
+      });
+      hands.onResults((r) => { if (onResultsRef.current) onResultsRef.current(r); });
+      handsRef.current = hands;
 
-    const camera = new Camera(video, {
-      onFrame: async () => {
-        if (!mountedRef.current) return;
-        try { if (handsRef.current) await handsRef.current.send({ image: video }); } catch {}
-      },
-      width: 320,
-      height: 240,
-    });
-    camera.start().catch(() => {
-      setCameraError('Camera access denied. Please allow camera permissions and reload.');
-    });
-    cameraRef.current = camera;
+      const camera = new Camera(video, {
+        onFrame: async () => {
+          if (!mountedRef.current) return;
+          try { if (handsRef.current) await handsRef.current.send({ image: video }); } catch {}
+        },
+        width: 320,
+        height: 240,
+      });
+      camera.start().catch(() => {
+        setCameraError('Camera access denied. Please allow camera permissions and reload.');
+      });
+      cameraRef.current = camera;
+    } catch {
+      setCameraError('Unable to start hand tracking. Please reload and try again.');
+    }
 
     return () => {
       mountedRef.current = false;

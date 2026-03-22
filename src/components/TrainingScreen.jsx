@@ -74,7 +74,7 @@ function separationCheck(newBatch, existingData) {
 // ───────────────────────────────────────────────────────────────────────
 
 export default function TrainingScreen({ trainingDataRef, existingGestures = [], signsList, onComplete, onBack }) {
-  const signs = signsList || GESTURES;
+  const signs = Array.isArray(signsList) ? signsList : GESTURES;
   const { settings } = useSettings();
   const mirrorX = settings.dominantHand === 'left';
   const [gestureIdx, setGestureIdx] = useState(0);
@@ -107,8 +107,8 @@ export default function TrainingScreen({ trainingDataRef, existingGestures = [],
   const mirrorXRef = useRef(mirrorX);
   useEffect(() => { mirrorXRef.current = mirrorX; }, [mirrorX]);
 
-  const gesture = signs[gestureIdx];
-  const needsTwoHands = gesture.twoHanded;
+  const gesture = signs[gestureIdx] || null;
+  const needsTwoHands = Boolean(gesture?.twoHanded);
 
   // Keep refs in sync
   useEffect(() => { gestureIdxRef.current = gestureIdx; }, [gestureIdx]);
@@ -170,40 +170,55 @@ export default function TrainingScreen({ trainingDataRef, existingGestures = [],
   // Mounted flag prevents stale onFrame calls after StrictMode cleanup
   const mountedRef = useRef(false);
 
+  if (!signs || signs.length === 0 || !gesture) {
+    return (
+      <div className="training radial-bg">
+        <div className="training-error">
+          <p>No trainable signs are available right now.</p>
+          <button className="btn" onClick={onBack}>Back</button>
+        </div>
+      </div>
+    );
+  }
+
   // Initialise MediaPipe Hands + Camera (runs once)
   useEffect(() => {
     mountedRef.current = true;
     const video = videoRef.current;
     if (!video) return;
 
-    const hands = new Hands({
-      locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`,
-    });
-    hands.setOptions({
-      maxNumHands: 2,
-      modelComplexity: 1,
-      minDetectionConfidence: 0.6,
-      minTrackingConfidence: 0.5,
-    });
-    hands.onResults((results) => {
-      if (onResultsRef.current) onResultsRef.current(results);
-    });
-    handsRef.current = hands;
+    try {
+      const hands = new Hands({
+        locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`,
+      });
+      hands.setOptions({
+        maxNumHands: 2,
+        modelComplexity: 1,
+        minDetectionConfidence: 0.6,
+        minTrackingConfidence: 0.5,
+      });
+      hands.onResults((results) => {
+        if (onResultsRef.current) onResultsRef.current(results);
+      });
+      handsRef.current = hands;
 
-    const camera = new Camera(video, {
-      onFrame: async () => {
-        if (!mountedRef.current) return;
-        try {
-          if (handsRef.current) await handsRef.current.send({ image: video });
-        } catch { /* closed during StrictMode teardown */ }
-      },
-      width: 320,
-      height: 240,
-    });
-    camera.start().catch(() => {
-      setCameraError('Camera access denied. Please allow camera permissions and reload.');
-    });
-    cameraRef.current = camera;
+      const camera = new Camera(video, {
+        onFrame: async () => {
+          if (!mountedRef.current) return;
+          try {
+            if (handsRef.current) await handsRef.current.send({ image: video });
+          } catch { /* closed during StrictMode teardown */ }
+        },
+        width: 320,
+        height: 240,
+      });
+      camera.start().catch(() => {
+        setCameraError('Camera access denied. Please allow camera permissions and reload.');
+      });
+      cameraRef.current = camera;
+    } catch {
+      setCameraError('Unable to start hand tracking. Please reload and try again.');
+    }
 
     return () => {
       mountedRef.current = false;
