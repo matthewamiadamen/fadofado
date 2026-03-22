@@ -63,7 +63,6 @@ export default function App() {
   const gameSignsRef = useRef(null);
 
   // ── Fingerspell state ───────────────────────────────────
-  const [fsMode, setFsMode] = useState('mediapipe'); // 'mediapipe' | 'cnn'
   const [fsLettersTrained, setFsLettersTrained] = useState(0);
   const fsTrainingDataRef = useRef([]);
 
@@ -339,8 +338,6 @@ export default function App() {
 
       {screen === 'fingerspell' && (
         <FingerspellScreen
-          mode={fsMode}
-          onSetMode={setFsMode}
           fsLettersTrained={fsLettersTrained}
           onGame={goFingerspellGame}
           onCommunicate={goFingerspellComm}
@@ -358,7 +355,6 @@ export default function App() {
 
       {screen === 'fingerspell-game' && (
         <FingerspellGame
-          mode={fsMode}
           trainingData={fsTrainingDataRef.current}
           onComplete={(correct, rounds) => {
             setScore(correct);
@@ -371,7 +367,6 @@ export default function App() {
 
       {screen === 'fingerspell-comm' && (
         <FingerspellComm
-          mode={fsMode}
           trainingData={fsTrainingDataRef.current}
           onExit={goFingerspell}
         />

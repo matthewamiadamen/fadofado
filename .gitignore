@@ -1,3 +1,40 @@
+# Frontend
 node_modules
 dist
 .DS_Store
+
+# Python / Backend
+__pycache__/
+*.py[cod]
+*.pyo
+*.so
+.Python
+.venv/
+venv/
+env/
+.env
+.env.local
+app.py
+irish_data.py
+train_10pct.py
+prepare_10pct.py
+ISL_Train_Colab.ipynb
+requirements.txt
+
+# ML models & training data
+checkpoints/
+data_10pct/
+data_fast/
+isldatset/
+*.task
+*.pth
+*.pt
+*.ckpt
+
+# Flask templates/static (backend)
+templates/
+static/
+
+# IDE
+.vscode/
+.idea/

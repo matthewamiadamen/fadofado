@@ -2,16 +2,12 @@ import './FingerspellScreen.css';
 import ISLAlphabetReference from './ISLAlphabetReference';
 
 export default function FingerspellScreen({
-  mode,
-  onSetMode,
   fsLettersTrained,
   onGame,
   onCommunicate,
   onTrain,
   onBack,
 }) {
-  const isMP = mode === 'mediapipe';
-
   return (
     <div className="fspell radial-bg">
       <div className="fspell-content">
@@ -24,37 +20,17 @@ export default function FingerspellScreen({
 
         <div className="fspell-divider" />
 
-        {/* Mode toggle */}
-        <div className="fspell-mode-toggle">
-          <button
-            className={`fspell-mode-btn ${isMP ? 'fspell-mode-active' : ''}`}
-            onClick={() => onSetMode('mediapipe')}
-          >
-            🖐️ MediaPipe
-          </button>
-          <button
-            className={`fspell-mode-btn ${!isMP ? 'fspell-mode-active' : ''}`}
-            onClick={() => onSetMode('cnn')}
-          >
-            🧠 CNN
-          </button>
-        </div>
-
         <p className="fspell-desc">
-          {isMP
-            ? 'Train each letter with your webcam using MediaPipe hand tracking. No backend needed — runs entirely in your browser.'
-            : 'Use the Flask backend and our CNN model to recognise ISL hand shapes in real time.'}
+          Train each letter with your webcam using MediaPipe hand tracking.
+          Runs entirely in your browser — no backend needed.
         </p>
 
-        {/* Train button (MediaPipe mode) */}
-        {isMP && (
-          <button className="btn btn-primary fspell-train-btn" onClick={onTrain}>
-            ✋ Train Letters {fsLettersTrained > 0 ? `(${fsLettersTrained}/26 trained)` : ''}
-          </button>
-        )}
+        <button className="btn btn-primary fspell-train-btn" onClick={onTrain}>
+          ✋ Train Letters {fsLettersTrained > 0 ? `(${fsLettersTrained}/26 trained)` : ''}
+        </button>
 
         <div className="fspell-cards">
-          <button className="fspell-card" onClick={onGame} disabled={isMP && fsLettersTrained === 0}>
+          <button className="fspell-card" onClick={onGame} disabled={fsLettersTrained === 0}>
             <span className="fspell-card-icon">🎯</span>
             <div className="fspell-card-titles">
               <span className="fspell-card-ga">Cluiche</span>
@@ -66,7 +42,7 @@ export default function FingerspellScreen({
             </p>
           </button>
 
-          <button className="fspell-card" onClick={onCommunicate} disabled={isMP && fsLettersTrained === 0}>
+          <button className="fspell-card" onClick={onCommunicate} disabled={fsLettersTrained === 0}>
             <span className="fspell-card-icon">💬</span>
             <div className="fspell-card-titles">
               <span className="fspell-card-ga">Cumarsáid</span>
@@ -80,14 +56,10 @@ export default function FingerspellScreen({
         </div>
 
         <div className="fspell-note">
-          <span className="fspell-note-label">
-            {isMP ? 'Status' : 'Requires'}
-          </span>
-          {isMP
-            ? (fsLettersTrained > 0
-              ? `${fsLettersTrained} of 26 letters trained — ready to play!`
-              : 'Train at least one letter to start playing.')
-            : 'Flask backend running on port 5000 with the trained CNN model.'}
+          <span className="fspell-note-label">Status</span>
+          {fsLettersTrained > 0
+            ? `${fsLettersTrained} of 26 letters trained — ready to play!`
+            : 'Train at least one letter to start playing.'}
         </div>
       </div>
 
