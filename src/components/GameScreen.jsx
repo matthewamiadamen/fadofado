@@ -219,8 +219,9 @@ export default function GameScreen({ trainingData, skippedGestures, signsList, o
     const video = videoRef.current;
     if (!video) return;
 
+    try {
     const hands = new Hands({
-      locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`,
+      locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/${file}`,
     });
     hands.setOptions({
       maxNumHands: 2,
@@ -250,6 +251,9 @@ export default function GameScreen({ trainingData, skippedGestures, signsList, o
     });
     camera.start().catch(console.error);
     cameraRef.current = camera;
+    } catch (err) {
+      console.error('MediaPipe Hands init failed:', err);
+    }
 
     return () => {
       // Mark unmounted FIRST so the onFrame loop stops sending

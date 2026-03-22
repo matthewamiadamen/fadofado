@@ -83,17 +83,6 @@ export default function FingerspellTraining({ onComplete, onBack }) {
   useEffect(() => { skippedGesturesRef.current = skippedGestures; }, [skippedGestures]);
   useEffect(() => { onCompleteRef.current = onComplete; }, [onComplete]);
 
-  if (!FINGERSPELL_SIGNS || FINGERSPELL_SIGNS.length === 0 || !gesture) {
-    return (
-      <div className="training radial-bg">
-        <div className="training-error">
-          <p>No fingerspelling letters are available right now.</p>
-          <button className="btn" onClick={onBack}>Back</button>
-        </div>
-      </div>
-    );
-  }
-
   const drawLandmarks = useCallback((allHands, width, height) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -144,7 +133,7 @@ export default function FingerspellTraining({ onComplete, onBack }) {
 
     try {
       const hands = new Hands({
-        locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`,
+        locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/${file}`,
       });
       hands.setOptions({
         maxNumHands: 1,
@@ -167,7 +156,8 @@ export default function FingerspellTraining({ onComplete, onBack }) {
         setCameraError('Camera access denied. Please allow camera permissions and reload.');
       });
       cameraRef.current = camera;
-    } catch {
+    } catch (err) {
+      console.error('MediaPipe Hands init failed:', err);
       setCameraError('Unable to start hand tracking. Please reload and try again.');
     }
 
@@ -321,6 +311,17 @@ export default function FingerspellTraining({ onComplete, onBack }) {
   const statusMsg = handDetected ? '✓ Hand detected' : '✗ No hand detected';
   const statusOk = handDetected;
   const steadinessColor = steadiness > 0.5 ? 'var(--teal)' : '#d4a017';
+
+  if (!FINGERSPELL_SIGNS || FINGERSPELL_SIGNS.length === 0 || !gesture) {
+    return (
+      <div className="training radial-bg">
+        <div className="training-error">
+          <p>No fingerspelling letters are available right now.</p>
+          <button className="btn" onClick={onBack}>Back</button>
+        </div>
+      </div>
+    );
+  }
 
   if (cameraError) {
     return (

@@ -170,17 +170,6 @@ export default function TrainingScreen({ trainingDataRef, existingGestures = [],
   // Mounted flag prevents stale onFrame calls after StrictMode cleanup
   const mountedRef = useRef(false);
 
-  if (!signs || signs.length === 0 || !gesture) {
-    return (
-      <div className="training radial-bg">
-        <div className="training-error">
-          <p>No trainable signs are available right now.</p>
-          <button className="btn" onClick={onBack}>Back</button>
-        </div>
-      </div>
-    );
-  }
-
   // Initialise MediaPipe Hands + Camera (runs once)
   useEffect(() => {
     mountedRef.current = true;
@@ -189,7 +178,7 @@ export default function TrainingScreen({ trainingDataRef, existingGestures = [],
 
     try {
       const hands = new Hands({
-        locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`,
+        locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/${file}`,
       });
       hands.setOptions({
         maxNumHands: 2,
@@ -216,7 +205,8 @@ export default function TrainingScreen({ trainingDataRef, existingGestures = [],
         setCameraError('Camera access denied. Please allow camera permissions and reload.');
       });
       cameraRef.current = camera;
-    } catch {
+    } catch (err) {
+      console.error('MediaPipe Hands init failed:', err);
       setCameraError('Unable to start hand tracking. Please reload and try again.');
     }
 
@@ -418,6 +408,17 @@ export default function TrainingScreen({ trainingDataRef, existingGestures = [],
 
   // Steadiness bar colour
   const steadinessColor = steadiness > 0.5 ? 'var(--teal)' : '#d4a017';
+
+  if (!signs || signs.length === 0 || !gesture) {
+    return (
+      <div className="training radial-bg">
+        <div className="training-error">
+          <p>No trainable signs are available right now.</p>
+          <button className="btn" onClick={onBack}>Back</button>
+        </div>
+      </div>
+    );
+  }
 
   if (cameraError) {
     return (
