@@ -119,3 +119,19 @@
 .mod-sign-item:hover {
   transform: scale(1.02);
 }
+
+.mod-video-btn {
+  margin-top: 8px;
+  width: 100%;
+}
+
+/* ── Responsive ────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .mod-detail-content {
+    padding: 20px 12px 40px;
+  }
+
+  .mod-sign-grid {
+    gap: 8px;
+  }
+}

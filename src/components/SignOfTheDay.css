@@ -1,0 +1,103 @@
+/* ── Sign of the Day ────────────────────────────────────── */
+.sotd {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  animation: fadeInUp 500ms ease both;
+  animation-delay: 100ms;
+}
+
+.sotd-label {
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--gold-dim);
+}
+
+.sotd-label-en {
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  color: var(--cream-dim);
+  margin-top: -6px;
+}
+
+.sotd-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: var(--green-surface);
+  border: 1px solid rgba(201, 168, 76, 0.15);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  width: 100%;
+}
+
+.sotd-icon {
+  font-size: 2.2rem;
+  flex-shrink: 0;
+}
+
+.sotd-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sotd-en {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  color: var(--gold-light);
+  letter-spacing: 1px;
+}
+
+.sotd-ga {
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  color: var(--cream);
+  font-style: italic;
+}
+
+.sotd-phonetic {
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  color: var(--cream-dim);
+}
+
+.sotd-module {
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  color: var(--cream-dim);
+  margin-top: 2px;
+}
+
+.sotd-instruction {
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  color: var(--cream-dim);
+  text-align: center;
+  line-height: 1.45;
+  max-width: 380px;
+}
+
+.sotd-practice {
+  margin-top: 4px;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 480px) {
+  .sotd-card {
+    padding: 12px 16px;
+  }
+
+  .sotd-instruction {
+    font-size: 0.78rem;
+  }
+}

@@ -1,0 +1,248 @@
+/* ── Review Screen ──────────────────────────────────────── */
+.review {
+  width: 100%;
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  overflow-y: auto;
+  position: relative;
+  z-index: 1;
+}
+
+.review-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 32px 24px 48px;
+  width: 100%;
+  max-width: 520px;
+  animation: fadeInUp 400ms ease both;
+}
+
+.review-back {
+  align-self: flex-start;
+}
+
+.review-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 5vw, 2.4rem);
+  color: var(--gold);
+  letter-spacing: 4px;
+}
+
+.review-subtitle {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--cream-dim);
+  margin-top: -10px;
+}
+
+/* Progress bar */
+.review-progress-track {
+  width: 100%;
+  height: 4px;
+  background: var(--green-surface);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.review-progress-fill {
+  height: 100%;
+  background: var(--gold);
+  border-radius: 2px;
+  transition: width 300ms ease;
+}
+
+/* Card */
+.review-card {
+  width: 100%;
+  background: var(--green-surface);
+  border: 1px solid rgba(201, 168, 76, 0.15);
+  border-radius: var(--radius);
+  padding: 28px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+}
+
+.review-card-icon {
+  font-size: 2.8rem;
+}
+
+.review-card-en {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  color: var(--gold-light);
+  letter-spacing: 2px;
+}
+
+.review-card-ga {
+  font-family: var(--font-body);
+  font-size: 1.1rem;
+  color: var(--cream);
+  font-style: italic;
+}
+
+.review-card-phonetic {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: var(--cream-dim);
+}
+
+.review-card-module {
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  color: var(--cream-dim);
+  background: rgba(201, 168, 76, 0.08);
+  padding: 3px 12px;
+  border-radius: var(--radius-pill);
+}
+
+.review-reveal {
+  margin-top: 12px;
+}
+
+/* Details (after reveal) */
+.review-details {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(201, 168, 76, 0.1);
+}
+
+.review-instruction {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--cream);
+  line-height: 1.5;
+  max-width: 400px;
+}
+
+.review-meta {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: var(--cream-dim);
+}
+
+.review-hint {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: var(--gold-dim);
+  font-style: italic;
+}
+
+.review-history {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  color: var(--cream-dim);
+}
+
+.review-prompt {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  color: var(--gold);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-top: 8px;
+}
+
+.review-grade-buttons {
+  display: flex;
+  gap: 16px;
+}
+
+.review-btn-wrong {
+  border-color: var(--red);
+  color: var(--red);
+}
+
+.review-btn-wrong:hover {
+  background: var(--red);
+  color: var(--cream);
+}
+
+.review-btn-right {
+  border-color: var(--teal);
+  color: var(--teal);
+}
+
+.review-btn-right:hover {
+  background: var(--teal);
+  color: var(--green-dark);
+}
+
+.review-session-status {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  color: var(--cream-dim);
+}
+
+/* Summary (done / no signs due) */
+.review-summary {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 40px 0;
+}
+
+.review-done-icon {
+  font-size: 3rem;
+  color: var(--teal);
+}
+
+.review-done-text {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  color: var(--gold-light);
+  letter-spacing: 2px;
+}
+
+.review-done-sub {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--cream-dim);
+}
+
+.review-score {
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  color: var(--gold);
+}
+
+.review-actions {
+  display: flex;
+  gap: 12px;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 480px) {
+  .review-content {
+    padding: 20px 16px 32px;
+  }
+
+  .review-card {
+    padding: 20px 16px;
+  }
+
+  .review-grade-buttons {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .review-grade-buttons .btn {
+    width: 100%;
+  }
+}

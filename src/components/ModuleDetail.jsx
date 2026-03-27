@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { getModuleSigns, getModuleTrainableSigns } from '../data/signs';
 import { getModuleById } from '../data/modules';
 import SignCard from './SignCard';
+import VideoDemo from './VideoDemo';
 import './ModuleDetail.css';
 
 /**
@@ -18,6 +19,7 @@ export default function ModuleDetail({
   const allSigns = getModuleSigns(moduleId);
   const trainable = getModuleTrainableSigns(moduleId);
   const [expandedSign, setExpandedSign] = useState(null);
+  const [videoSign, setVideoSign] = useState(null);
 
   if (!mod) return null;
 
@@ -63,9 +65,21 @@ export default function ModuleDetail({
                   compact={expandedSign !== sign.id}
                   showDetails={expandedSign === sign.id}
                 />
+                {expandedSign === sign.id && (
+                  <button
+                    className="btn btn-small mod-video-btn"
+                    onClick={(e) => { e.stopPropagation(); setVideoSign(sign); }}
+                  >
+                    &#9658; Watch Demo
+                  </button>
+                )}
               </div>
             ))}
           </div>
+
+          {videoSign && (
+            <VideoDemo sign={videoSign} onClose={() => setVideoSign(null)} />
+          )}
         </section>
 
         <div className="mod-detail-divider" />

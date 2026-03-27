@@ -1,11 +1,20 @@
 import { getAchievement } from '../data/achievements';
 import { getRandomProverb } from '../data/seanfhocail';
+import { getPlayerName } from '../services/leaderboard';
 import { useState } from 'react';
+import AchievementCard from './AchievementCard';
 import './ScoreScreen.css';
 
-export default function ScoreScreen({ score, total, onPlayAgain, onHome }) {
+const MODE_LABELS = {
+  game: 'Sign Game',
+  fingerspell: 'Fingerspell',
+  quiz: 'Quiz',
+};
+
+export default function ScoreScreen({ score, total, gameMode, onPlayAgain, onHome, onLeaderboard }) {
   const achievement = getAchievement(score, total);
   const [proverb] = useState(() => getRandomProverb(achievement.proverb.ga));
+  const [showShare, setShowShare] = useState(false);
 
   return (
     <div className="score radial-bg">
@@ -42,7 +51,26 @@ export default function ScoreScreen({ score, total, onPlayAgain, onHome }) {
           <button className="btn" onClick={onHome}>
             Baile — Home
           </button>
+          {onLeaderboard && (
+            <button className="btn" onClick={onLeaderboard}>
+              Clár Ceannais
+            </button>
+          )}
+          <button className="btn btn-small" onClick={() => setShowShare((v) => !v)}>
+            {showShare ? 'Hide' : 'Share Achievement'}
+          </button>
         </div>
+
+        {showShare && (
+          <AchievementCard
+            score={score}
+            total={total}
+            title={achievement.title}
+            titleEn={achievement.titleEn}
+            playerName={getPlayerName()}
+            mode={MODE_LABELS[gameMode] || 'Game'}
+          />
+        )}
       </div>
     </div>
   );

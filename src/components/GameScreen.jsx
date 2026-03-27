@@ -4,6 +4,7 @@ import { knnPredict } from '../utils/knnClassifier';
 import { GESTURES } from '../gestures';
 import { useSettings } from '../contexts/SettingsContext';
 import { SignLabel } from './SignCard';
+import { getLocateFile } from '../utils/mediapipeLoader';
 import './GameScreen.css';
 
 const TOTAL_ROUNDS = 5;
@@ -57,6 +58,7 @@ export default function GameScreen({ trainingData, skippedGestures, signsList, o
   const pausedRef = useRef(false);
   const completedRef = useRef(false);
   const mountedRef = useRef(false);
+  const signResultsRef = useRef([]); // Track per-sign results for SRS
 
   const mirrorXRef = useRef(mirrorX);
   useEffect(() => { mirrorXRef.current = mirrorX; }, [mirrorX]);
@@ -110,7 +112,7 @@ export default function GameScreen({ trainingData, skippedGestures, signsList, o
     const nextIdx = roundIdxRef.current + 1;
     if (nextIdx >= totalRounds) {
       completedRef.current = true;
-      onCompleteRef.current(scoreRef.current, totalRounds);
+      onCompleteRef.current(scoreRef.current, totalRounds, signResultsRef.current);
       return;
     }
     roundIdxRef.current = nextIdx;
@@ -123,6 +125,10 @@ export default function GameScreen({ trainingData, skippedGestures, signsList, o
 
   // Skip round (counts as incorrect)
   const handleSkip = useCallback(() => {
+    const targetGesture = roundsRef.current[roundIdxRef.current];
+    if (targetGesture) {
+      signResultsRef.current.push({ signId: targetGesture.id, correct: false });
+    }
     setSkipsUsed((prev) => prev + 1);
     pausedRef.current = true;
     setConfidence(0);
@@ -182,6 +188,7 @@ export default function GameScreen({ trainingData, skippedGestures, signsList, o
             setScore(scoreRef.current);
             setMatched(true);
             pausedRef.current = true;
+            signResultsRef.current.push({ signId: targetGesture.id, correct: true });
             setFlashWord({ ga: targetGesture.ga, en: targetGesture.en });
 
             setTimeout(() => {
@@ -219,7 +226,7 @@ export default function GameScreen({ trainingData, skippedGestures, signsList, o
 
     try {
     const hands = new window.Hands({
-      locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`,
+      locateFile: getLocateFile(),
     });
     hands.setOptions({
       maxNumHands: 2,
@@ -334,7 +341,7 @@ export default function GameScreen({ trainingData, skippedGestures, signsList, o
 
       {/* Bottom overlay: confidence bar + skip */}
       <div className="game-bottom">
-        <div className="game-bar-track">
+        <div className="game-bar-track" role="progressbar" aria-valuenow={Math.round(confidence * 100)} aria-valuemin={0} aria-valuemax={100} aria-label="Sign recognition confidence">
           <div
             className="game-bar-fill"
             style={{

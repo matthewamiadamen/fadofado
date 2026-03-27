@@ -6,6 +6,7 @@ import { GESTURES } from '../gestures';
 import { useSettings } from '../contexts/SettingsContext';
 import { SignLabel } from './SignCard';
 import GestureAnimation from './GestureAnimation';
+import { getLocateFile } from '../utils/mediapipeLoader';
 import './TrainingScreen.css';
 
 const SAMPLES_REQUIRED = 20;
@@ -176,7 +177,7 @@ export default function TrainingScreen({ trainingDataRef, existingGestures = [],
 
     try {
       const hands = new window.Hands({
-        locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`,
+        locateFile: getLocateFile(),
       });
       hands.setOptions({
         maxNumHands: 2,
@@ -465,7 +466,7 @@ export default function TrainingScreen({ trainingDataRef, existingGestures = [],
         </div>
 
         {/* Progress bar */}
-        <div className="training-progress-track">
+        <div className="training-progress-track" role="progressbar" aria-valuenow={samplesCollected} aria-valuemin={0} aria-valuemax={SAMPLES_REQUIRED} aria-label="Samples collected">
           <div
             className="training-progress-fill"
             style={{ width: `${(samplesCollected / SAMPLES_REQUIRED) * 100}%` }}

@@ -4,6 +4,7 @@ import { knnPredict } from '../utils/knnClassifier';
 import { SIGN_ID_TO_LETTER } from '../data/fingerspellSigns';
 import { WORDS, stripFadas } from '../data/irishWords';
 import ISLAlphabetReference from './ISLAlphabetReference';
+import { getLocateFile } from '../utils/mediapipeLoader';
 import './FingerspellGame.css';
 
 const TOTAL_ROUNDS = 5;
@@ -178,7 +179,7 @@ export default function FingerspellGame({ trainingData, onComplete, onExit }) {
     if (!video) return;
 
     const hands = new window.Hands({
-      locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`,
+      locateFile: getLocateFile(),
     });
     hands.setOptions({
       maxNumHands: 1,

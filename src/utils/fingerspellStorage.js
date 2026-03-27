@@ -1,31 +1,55 @@
 /**
  * Persistence for fingerspell (A-Z) MediaPipe training data.
- * Separate from the main gesture storage so the two don't conflict.
+ * Uses IndexedDB (via idbStorage) with one-time migration from localStorage.
+ * All public functions are async.
  */
 
-const STORAGE_KEY = 'fingerspell-training';
+import { idbGet, idbSet, idbDelete, migrateFromLocalStorage } from './idbStorage';
 
-/** Load saved fingerspell training samples. Returns { samples, skippedGestures } or null. */
-export function loadFingerspellData() {
+const STORAGE_KEY = 'fingerspell-training';
+const MIGRATION_FLAG = 'idb-migrated-fingerspell';
+
+let migrationDone = false;
+
+async function ensureMigrated() {
+  if (migrationDone) return;
+  migrationDone = true;
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return null;
-    const data = JSON.parse(raw);
-    if (!data || !Array.isArray(data.samples)) return null;
-    return {
-      samples: data.samples.map((s) => ({
-        label: s.label,
-        features: new Float32Array(s.features),
-      })),
-      skippedGestures: data.skippedGestures || [],
-    };
+    if (localStorage.getItem(MIGRATION_FLAG)) return;
+    const migrated = await migrateFromLocalStorage(STORAGE_KEY);
+    if (migrated !== null) {
+      localStorage.setItem(MIGRATION_FLAG, '1');
+    }
+  } catch {
+    // ignore
+  }
+}
+
+async function readRaw() {
+  await ensureMigrated();
+  try {
+    return (await idbGet(STORAGE_KEY)) || null;
   } catch {
     return null;
   }
 }
 
+/** Load saved fingerspell training samples. Returns { samples, skippedGestures } or null. */
+export async function loadFingerspellData() {
+  const data = await readRaw();
+  if (!data || !Array.isArray(data.samples)) return null;
+  return {
+    samples: data.samples.map((s) => ({
+      label: s.label,
+      features: new Float32Array(s.features),
+    })),
+    skippedGestures: data.skippedGestures || [],
+  };
+}
+
 /** Save fingerspell training data. */
-export function saveFingerspellData(samples, skippedGestures = []) {
+export async function saveFingerspellData(samples, skippedGestures = []) {
+  await ensureMigrated();
   const data = {
     samples: samples.map((s) => ({
       label: s.label,
@@ -33,35 +57,23 @@ export function saveFingerspellData(samples, skippedGestures = []) {
     })),
     skippedGestures,
   };
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  await idbSet(STORAGE_KEY, data);
 }
 
 /** Check whether training data exists for at least one letter. */
-export function hasFingerspellData() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return false;
-    const data = JSON.parse(raw);
-    return data && Array.isArray(data.samples) && data.samples.length > 0;
-  } catch {
-    return false;
-  }
+export async function hasFingerspellData() {
+  const data = await readRaw();
+  return data && Array.isArray(data.samples) && data.samples.length > 0;
 }
 
 /** Get list of trained letter ids. */
-export function getTrainedLetters() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return [];
-    const data = JSON.parse(raw);
-    if (!data || !Array.isArray(data.samples)) return [];
-    return [...new Set(data.samples.map((s) => s.label))];
-  } catch {
-    return [];
-  }
+export async function getTrainedLetters() {
+  const data = await readRaw();
+  if (!data || !Array.isArray(data.samples)) return [];
+  return [...new Set(data.samples.map((s) => s.label))];
 }
 
 /** Clear all fingerspell training data. */
-export function clearFingerspellData() {
-  try { localStorage.removeItem(STORAGE_KEY); } catch { /* ignore */ }
+export async function clearFingerspellData() {
+  try { await idbDelete(STORAGE_KEY); } catch { /* ignore */ }
 }

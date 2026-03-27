@@ -4,6 +4,7 @@ import { knnPredict } from '../utils/knnClassifier';
 import { SIGN_ID_TO_LETTER } from '../data/fingerspellSigns';
 import { translateSentence } from '../data/irishWords';
 import ISLAlphabetReference from './ISLAlphabetReference';
+import { getLocateFile } from '../utils/mediapipeLoader';
 import './FingerspellComm.css';
 
 const SENTENCE_TIMEOUT_MS = 5000;
@@ -166,7 +167,7 @@ export default function FingerspellComm({ trainingData, onExit }) {
     if (!video) return;
 
     const hands = new window.Hands({
-      locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`,
+      locateFile: getLocateFile(),
     });
     hands.setOptions({
       maxNumHands: 1,

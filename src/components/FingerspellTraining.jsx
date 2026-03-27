@@ -3,6 +3,7 @@ import { extractFeatures } from '../utils/featureExtraction';
 import { euclidean, knnPredict } from '../utils/knnClassifier';
 import { FINGERSPELL_SIGNS } from '../data/fingerspellSigns';
 import ISLAlphabetReference from './ISLAlphabetReference';
+import { getLocateFile } from '../utils/mediapipeLoader';
 import './TrainingScreen.css';
 
 const SAMPLES_REQUIRED = 20;
@@ -131,7 +132,7 @@ export default function FingerspellTraining({ onComplete, onBack }) {
 
     try {
       const hands = new window.Hands({
-        locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`,
+        locateFile: getLocateFile(),
       });
       hands.setOptions({
         maxNumHands: 1,

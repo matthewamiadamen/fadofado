@@ -1,13 +1,18 @@
-import { useState } from 'react';
-import { GESTURES } from '../data/signs';
+import { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { GESTURES, getAllSigns } from '../data/signs';
 import { getRandomProverb } from '../data/seanfhocail';
+import { getDueSignsForUser } from '../services/srs';
 import SignCard from './SignCard';
+import SignOfTheDay from './SignOfTheDay';
 import './WelcomeScreen.css';
 
 export default function WelcomeScreen({
   trained,
   gestureSummary,
   storageError,
+  defaultModelAvailable,
+  onQuickStart,
   onTrain,
   onPlay,
   onClearAll,
@@ -16,15 +21,38 @@ export default function WelcomeScreen({
   onSettings,
   onMySigns,
   onFingerspell,
+  onQuiz,
+  onReview,
+  onProgress,
+  onLeaderboard,
 }) {
+  const navigate = useNavigate();
   const [proverb] = useState(() => getRandomProverb());
 
   // Show a small subset of signs as preview cards
   const previewSigns = GESTURES.slice(0, 4);
 
+  // Count due signs for review badge
+  const dueCount = useMemo(() => {
+    const allSigns = getAllSigns();
+    return getDueSignsForUser(allSigns, 100).length;
+  }, []);
+
+  function handlePracticeSign() {
+    navigate('/review');
+  }
+
   return (
-    <div className="welcome radial-bg">
-      <div className="welcome-content">
+    <div className="welcome radial-bg" role="region" aria-label="Welcome">
+      {/* Shamrock backdrop — remove this block to revert shamrocks */}
+      <div className="welcome-shamrocks">
+        {Array.from({ length: 15 }, (_, i) => (
+          <span key={i} className="shamrock">☘</span>
+        ))}
+      </div>
+      {/* End shamrock backdrop */}
+
+      <div className="welcome-content" style={{ position: 'relative', zIndex: 1 }}>
         <h1 className="welcome-title">LÁMHA</h1>
         <p className="welcome-subtitle">Learn Irish Sign Language</p>
 
@@ -36,6 +64,9 @@ export default function WelcomeScreen({
           <span className="proverb-en">{proverb.en}</span>
         </div>
 
+        {/* Sign of the Day */}
+        <SignOfTheDay onPractice={handlePracticeSign} />
+
         {/* Sign preview cards — trilingual */}
         <div className="gesture-cards">
           {previewSigns.map((sign) => (
@@ -45,22 +76,37 @@ export default function WelcomeScreen({
 
         {/* Main actions */}
         <div className="welcome-actions">
-          <button className="btn btn-primary" onClick={onModules}>
+          {defaultModelAvailable && (
+            <button className="btn" onClick={onQuickStart}>
+              Quick Start — Use Default Model
+            </button>
+          )}
+
+          <button className="btn" onClick={onModules}>
             Foghlaim — Learn
           </button>
 
-          <button className="btn btn-primary" onClick={onTrain}>
+          <button className="btn" onClick={onTrain}>
             {trained ? 'Retrain Signs' : 'Train Signs'}
           </button>
 
           {trained && (
-            <button className="btn" onClick={onPlay} style={{ animationDelay: '0.1s' }}>
+            <button className="btn" onClick={onPlay}>
               Cluiche — Play
             </button>
           )}
 
-          <button className="btn" onClick={onFingerspell} style={{ animationDelay: '0.2s' }}>
+          <button className="btn" onClick={onFingerspell}>
             Litriú — Fingerspell
+          </button>
+
+          <button className="btn" onClick={onQuiz}>
+            Triail — Quiz
+          </button>
+
+          <button className="btn" onClick={onReview}>
+            Athbhreithniú — Review
+            {dueCount > 0 && <span className="welcome-badge">{dueCount}</span>}
           </button>
         </div>
 
@@ -72,9 +118,11 @@ export default function WelcomeScreen({
 
         {/* Secondary nav */}
         <div className="welcome-nav">
+          <button className="btn btn-small" onClick={onProgress}>Dul Chun Cinn</button>
+          <button className="btn btn-small" onClick={onLeaderboard}>Clár Ceannais</button>
           {gestureSummary.length > 0 && (
             <button className="btn btn-small" onClick={onMySigns}>
-              Mo Chomhartha&iacute; ({gestureSummary.length})
+              Mo Chomharthaí ({gestureSummary.length})
             </button>
           )}
           <button className="btn btn-small" onClick={onAbout}>Faoin ISL</button>

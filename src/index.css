@@ -91,6 +91,11 @@ body {
   outline: none;
 }
 
+.btn:focus-visible {
+  outline: 2px solid var(--gold-light);
+  outline-offset: 3px;
+}
+
 .btn:hover {
   background: var(--gold);
   color: var(--green-dark);
@@ -132,4 +137,84 @@ body {
 .proverb-en {
   font-family: var(--font-body);
   color: var(--cream-dim);
+}
+
+/* ── Focus & Accessibility ────────────────────────────── */
+*:focus-visible {
+  outline: 2px solid var(--gold-light);
+  outline-offset: 2px;
+}
+
+.skip-to-content {
+  position: absolute;
+  top: -100%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10001;
+  background: var(--gold);
+  color: var(--green-dark);
+  padding: 0.75rem 1.5rem;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  border-radius: var(--radius);
+  text-decoration: none;
+  transition: top 0.2s ease;
+}
+
+.skip-to-content:focus {
+  top: 1rem;
+}
+
+/* ── Screen reader only (visually hidden) ────────────── */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── Color contrast fixes ────────────────────────────── */
+/* --gold-dim (#7a6230) fails WCAG AA on dark bg. Bump to #a68a45 (4.5:1+) */
+/* --cream-dim (#9a8f79) fails WCAG AA. Bump to #b5a88e (4.5:1+) */
+:root {
+  --gold-dim: #a68a45;
+  --cream-dim: #b5a88e;
+}
+
+/* ── Responsive breakpoints ──────────────────────────── */
+
+/* Tablet (768px) */
+@media (max-width: 768px) {
+  .btn {
+    font-size: 0.75rem;
+    padding: 10px 20px;
+    letter-spacing: 2px;
+  }
+
+  .btn-small {
+    font-size: 0.65rem;
+    padding: 7px 14px;
+  }
+}
+
+/* Phone (480px) */
+@media (max-width: 480px) {
+  .btn {
+    font-size: 0.7rem;
+    padding: 10px 16px;
+    letter-spacing: 1.5px;
+    width: 100%;
+    text-align: center;
+  }
+
+  .btn-small {
+    width: auto;
+  }
 }

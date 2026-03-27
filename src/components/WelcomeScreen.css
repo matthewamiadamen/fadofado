@@ -1,13 +1,19 @@
 /* ── Welcome Screen ─────────────────────────────────────── */
 .welcome {
   width: 100%;
-  height: 100%;
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
   z-index: 1;
   overflow-y: auto;
+  background: radial-gradient(ellipse at center, var(--green-mid) 0%, var(--green-dark) 70%);
+}
+
+/* Hide the celtic knotwork pattern behind the welcome screen */
+.app:has(.welcome) .celtic-bg {
+  display: none;
 }
 
 .welcome-content {
@@ -16,6 +22,7 @@
   align-items: center;
   gap: 20px;
   padding: 32px 24px 48px;
+  width: 100%;
 }
 
 /* Title with gold glow */
@@ -109,6 +116,25 @@
   animation: fadeInUp 500ms ease both;
 }
 
+/* ── Review badge ─────────────────────────────────────── */
+.welcome-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  font-family: var(--font-body);
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--green-dark);
+  background: var(--teal);
+  border-radius: 10px;
+  padding: 0 6px;
+  margin-left: 8px;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
 /* ── Storage error banner ──────────────────────────────── */
 .welcome-error {
   display: flex;
@@ -126,6 +152,56 @@
   animation: fadeInUp 400ms ease both;
 }
 
+/* ── Shamrock Backdrop (remove this section to revert shamrocks) ── */
+.welcome-shamrocks {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.welcome-shamrocks .shamrock {
+  position: absolute;
+  opacity: 0.15;
+  color: #2a7a55;
+  animation: shamrockDrift linear infinite;
+}
+
+.welcome-shamrocks .shamrock:nth-child(1)  { font-size: 3.5rem; left: 3%;  animation-duration: 28s; animation-delay: 0s; }
+.welcome-shamrocks .shamrock:nth-child(2)  { font-size: 2.5rem; left: 15%; animation-duration: 22s; animation-delay: -4s; opacity: 0.12; }
+.welcome-shamrocks .shamrock:nth-child(3)  { font-size: 4rem;   left: 28%; animation-duration: 32s; animation-delay: -10s; opacity: 0.1; }
+.welcome-shamrocks .shamrock:nth-child(4)  { font-size: 2.8rem; left: 42%; animation-duration: 25s; animation-delay: -7s; }
+.welcome-shamrocks .shamrock:nth-child(5)  { font-size: 3.2rem; left: 55%; animation-duration: 30s; animation-delay: -15s; opacity: 0.12; }
+.welcome-shamrocks .shamrock:nth-child(6)  { font-size: 4.5rem; left: 68%; animation-duration: 35s; animation-delay: -20s; opacity: 0.08; }
+.welcome-shamrocks .shamrock:nth-child(7)  { font-size: 2.2rem; left: 78%; animation-duration: 24s; animation-delay: -3s; opacity: 0.14; }
+.welcome-shamrocks .shamrock:nth-child(8)  { font-size: 3rem;   left: 88%; animation-duration: 27s; animation-delay: -12s; opacity: 0.11; }
+.welcome-shamrocks .shamrock:nth-child(9)  { font-size: 2rem;   left: 35%; animation-duration: 20s; animation-delay: -8s; opacity: 0.13; }
+.welcome-shamrocks .shamrock:nth-child(10) { font-size: 3.8rem; left: 92%; animation-duration: 33s; animation-delay: -18s; opacity: 0.09; }
+.welcome-shamrocks .shamrock:nth-child(11) { font-size: 2.6rem; left: 8%;  animation-duration: 26s; animation-delay: -6s; opacity: 0.11; }
+.welcome-shamrocks .shamrock:nth-child(12) { font-size: 3.4rem; left: 50%; animation-duration: 29s; animation-delay: -14s; opacity: 0.1; }
+.welcome-shamrocks .shamrock:nth-child(13) { font-size: 2rem;   left: 72%; animation-duration: 21s; animation-delay: -2s; opacity: 0.13; }
+.welcome-shamrocks .shamrock:nth-child(14) { font-size: 4.2rem; left: 20%; animation-duration: 36s; animation-delay: -22s; opacity: 0.07; }
+.welcome-shamrocks .shamrock:nth-child(15) { font-size: 2.4rem; left: 60%; animation-duration: 23s; animation-delay: -9s; opacity: 0.12; }
+
+@keyframes shamrockDrift {
+  0% {
+    transform: translateY(110vh) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: inherit;
+  }
+  90% {
+    opacity: inherit;
+  }
+  100% {
+    transform: translateY(-10vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+/* ── End Shamrock Backdrop ──────────────────────────────── */
+
 /* ── Animations ─────────────────────────────────────────── */
 @keyframes fadeInUp {
   from {
@@ -135,5 +211,49 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* ── Responsive ────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .welcome-content {
+    gap: 16px;
+    padding: 24px 16px 32px;
+  }
+
+  .gesture-cards {
+    gap: 8px;
+  }
+
+  .welcome-actions {
+    gap: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .welcome-content {
+    gap: 12px;
+    padding: 16px 12px 24px;
+  }
+
+  .welcome-actions {
+    flex-direction: column;
+    width: 100%;
+    max-width: 320px;
+  }
+
+  .welcome-nav {
+    flex-direction: column;
+    width: 100%;
+    max-width: 320px;
+    align-items: center;
+  }
+
+  .gesture-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    width: 100%;
+    max-width: 320px;
   }
 }

@@ -4,17 +4,58 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Lámha — Learn Irish Sign Language</title>
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#0a1a0f" />
+    <meta name="description" content="Real-time Irish Sign Language gesture recognition and learning platform" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <link rel="apple-touch-icon" href="/icons/icon-192.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap"
       rel="stylesheet"
     />
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+    <!-- MediaPipe: local-first with CDN fallback -->
+    <script>
+      function loadScript(src, fallback) {
+        return new Promise(function(resolve, reject) {
+          var s = document.createElement('script');
+          s.src = src;
+          s.crossOrigin = 'anonymous';
+          s.onload = resolve;
+          s.onerror = function() {
+            if (fallback) {
+              var f = document.createElement('script');
+              f.src = fallback;
+              f.crossOrigin = 'anonymous';
+              f.onload = resolve;
+              f.onerror = reject;
+              document.head.appendChild(f);
+            } else { reject(); }
+          };
+          document.head.appendChild(s);
+        });
+      }
+      Promise.all([
+        loadScript('/mediapipe/camera_utils.js', 'https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js'),
+        loadScript('/mediapipe/hands/hands.js', 'https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js')
+      ]).then(function() {
+        window.dispatchEvent(new Event('mediapipe-ready'));
+      }).catch(function() {
+        console.error('Failed to load MediaPipe from both local and CDN sources');
+      });
+    </script>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch(() => {});
+        });
+      }
+    </script>
   </body>
 </html>

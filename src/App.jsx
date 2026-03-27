@@ -1,18 +1,8 @@
-import { useState, useRef, useCallback, useEffect } from 'react';
-import WelcomeScreen from './components/WelcomeScreen';
-import TrainingScreen from './components/TrainingScreen';
-import GameScreen from './components/GameScreen';
-import ScoreScreen from './components/ScoreScreen';
-import AboutISL from './components/AboutISL';
-import ModuleSelect from './components/ModuleSelect';
-import ModuleDetail from './components/ModuleDetail';
-import SettingsPanel from './components/SettingsPanel';
-import MySignsScreen from './components/MySignsScreen';
-import FingerspellScreen from './components/FingerspellScreen';
-import FingerspellGame from './components/FingerspellGame';
-import FingerspellComm from './components/FingerspellComm';
-import FingerspellTraining from './components/FingerspellTraining';
-import { getModuleTrainableSigns, GESTURES } from './data/signs';
+import { useState, useRef, useCallback, useEffect, lazy, Suspense } from 'react';
+import { Routes, Route, useNavigate, useParams } from 'react-router-dom';
+import { useToast } from './components/Toast';
+import LoadingScreen from './components/LoadingScreen';
+import { getModuleTrainableSigns, GESTURES, getAllSigns } from './data/signs';
 import {
   loadGestures,
   saveGestures,
@@ -27,7 +17,29 @@ import {
   saveFingerspellData,
   getTrainedLetters,
 } from './utils/fingerspellStorage';
+import { hasDefaultModel, loadDefaultModel, defaultModelToSamples } from './utils/defaultModel';
+import { recordSignResult, recordActivity } from './services/srs';
+import { addScore, getPlayerName } from './services/leaderboard';
 import './App.css';
+
+// ── Lazy-loaded route components ───────────────────────────
+const WelcomeScreen = lazy(() => import('./components/WelcomeScreen'));
+const TrainingScreen = lazy(() => import('./components/TrainingScreen'));
+const GameScreen = lazy(() => import('./components/GameScreen'));
+const ScoreScreen = lazy(() => import('./components/ScoreScreen'));
+const AboutISL = lazy(() => import('./components/AboutISL'));
+const ModuleSelect = lazy(() => import('./components/ModuleSelect'));
+const ModuleDetail = lazy(() => import('./components/ModuleDetail'));
+const SettingsPanel = lazy(() => import('./components/SettingsPanel'));
+const MySignsScreen = lazy(() => import('./components/MySignsScreen'));
+const FingerspellScreen = lazy(() => import('./components/FingerspellScreen'));
+const FingerspellGame = lazy(() => import('./components/FingerspellGame'));
+const FingerspellComm = lazy(() => import('./components/FingerspellComm'));
+const FingerspellTraining = lazy(() => import('./components/FingerspellTraining'));
+const QuizMode = lazy(() => import('./components/QuizMode'));
+const ReviewScreen = lazy(() => import('./components/ReviewScreen'));
+const ProgressDashboard = lazy(() => import('./components/ProgressDashboard'));
+const Leaderboard = lazy(() => import('./components/Leaderboard'));
 
 // Module progress storage
 const PROGRESS_KEY = 'isl-module-progress';
@@ -43,16 +55,31 @@ function saveModuleProgress(progress) {
   try { localStorage.setItem(PROGRESS_KEY, JSON.stringify(progress)); } catch { /* ignore */ }
 }
 
+// ── Wrapper for module-scoped routes ────────────────────────
+function ModuleDetailRoute({ trained, onStartTraining, onStartGame, onBack }) {
+  const { moduleId } = useParams();
+  return (
+    <ModuleDetail
+      moduleId={moduleId}
+      trained={trained}
+      onStartTraining={onStartTraining}
+      onStartGame={onStartGame}
+      onBack={onBack}
+    />
+  );
+}
+
 export default function App() {
-  // Screens: welcome | training | game | score | about | modules | module-detail | settings
-  const [screen, setScreen] = useState('welcome');
+  const navigate = useNavigate();
   const [score, setScore] = useState(0);
   const [total, setTotal] = useState(5);
   const [trained, setTrained] = useState(false);
   const [gestureSummary, setGestureSummary] = useState([]);
   const [storageError, setStorageError] = useState(null);
+  const toast = useToast();
   const [activeModuleId, setActiveModuleId] = useState(null);
   const [moduleProgress, setModuleProgress] = useState(loadModuleProgress);
+  const [defaultModelAvailable, setDefaultModelAvailable] = useState(false);
 
   // Training data lives in a ref so it survives navigation without triggering re-renders
   const trainingDataRef = useRef([]);
@@ -68,76 +95,109 @@ export default function App() {
 
   // Load saved gestures on mount
   useEffect(() => {
-    try {
-      const saved = loadGestures();
-      if (saved && saved.samples.length > 0) {
-        trainingDataRef.current = saved.samples;
-        skippedGesturesRef.current = saved.skippedGestures;
-        setTrained(true);
-        setGestureSummary(getGestureSummary());
+    (async () => {
+      try {
+        const saved = await loadGestures();
+        if (saved && saved.samples.length > 0) {
+          trainingDataRef.current = saved.samples;
+          skippedGesturesRef.current = saved.skippedGestures;
+          setTrained(true);
+          setGestureSummary(await getGestureSummary());
+        }
+      } catch {
+        setStorageError('Saved gesture data appears corrupted. You can clear it and retrain.');
       }
-    } catch {
-      setStorageError('Saved gesture data appears corrupted. You can clear it and retrain.');
-    }
 
-    // Load fingerspell training data
-    try {
-      const fsSaved = loadFingerspellData();
-      if (fsSaved && fsSaved.samples.length > 0) {
-        fsTrainingDataRef.current = fsSaved.samples;
-        setFsLettersTrained(getTrainedLetters().length);
-      }
-    } catch { /* ignore */ }
+      try {
+        const fsSaved = await loadFingerspellData();
+        if (fsSaved && fsSaved.samples.length > 0) {
+          fsTrainingDataRef.current = fsSaved.samples;
+          const letters = await getTrainedLetters();
+          setFsLettersTrained(letters.length);
+        }
+      } catch { /* ignore */ }
+
+      hasDefaultModel().then((has) => setDefaultModelAvailable(has)).catch(() => {});
+    })();
   }, []);
 
-  const refreshSummary = useCallback(() => {
-    setGestureSummary(getGestureSummary());
+  const refreshSummary = useCallback(async () => {
+    setGestureSummary(await getGestureSummary());
   }, []);
 
   // ── Navigation ──────────────────────────────────────────
-  const goWelcome = useCallback(() => { setActiveModuleId(null); setScreen('welcome'); }, []);
-  const goAbout = useCallback(() => setScreen('about'), []);
-  const goModules = useCallback(() => setScreen('modules'), []);
-  const goSettings = useCallback(() => setScreen('settings'), []);
-  const goMySigns = useCallback(() => setScreen('my-signs'), []);
-  const goFingerspell = useCallback(() => setScreen('fingerspell'), []);
-  const goFingerspellGame = useCallback(() => setScreen('fingerspell-game'), []);
-  const goFingerspellComm = useCallback(() => setScreen('fingerspell-comm'), []);
-  const goFingerspellTraining = useCallback(() => setScreen('fingerspell-training'), []);
+  const goWelcome = useCallback(() => { setActiveModuleId(null); navigate('/'); }, [navigate]);
+  const goAbout = useCallback(() => navigate('/about'), [navigate]);
+  const goModules = useCallback(() => navigate('/modules'), [navigate]);
+  const goSettings = useCallback(() => navigate('/settings'), [navigate]);
+  const goMySigns = useCallback(() => navigate('/my-signs'), [navigate]);
+  const goFingerspell = useCallback(() => navigate('/fingerspell'), [navigate]);
+  const goFingerspellGame = useCallback(() => navigate('/fingerspell/game'), [navigate]);
+  const goFingerspellComm = useCallback(() => navigate('/fingerspell/communicate'), [navigate]);
+  const goFingerspellTraining = useCallback(() => navigate('/fingerspell/train'), [navigate]);
+  const goReview = useCallback(() => navigate('/review'), [navigate]);
+  const goProgress = useCallback(() => navigate('/progress'), [navigate]);
+  const goLeaderboard = useCallback(() => navigate('/leaderboard'), [navigate]);
+
+  // Track last game mode for score screen context
+  const lastGameModeRef = useRef('game');
+
+  const handleQuickStart = useCallback(async () => {
+    try {
+      const data = await loadDefaultModel();
+      if (!data) {
+        toast('Default model not available', 'error');
+        return;
+      }
+      const { samples, skippedGestures } = defaultModelToSamples(data);
+      trainingDataRef.current = samples;
+      skippedGesturesRef.current = skippedGestures;
+      setTrained(true);
+      await saveGestures(samples, skippedGestures);
+      await refreshSummary();
+      toast('Default model loaded — you can start playing!', 'success');
+    } catch {
+      toast('Failed to load default model', 'error');
+    }
+  }, [toast, refreshSummary]);
 
   const goTraining = useCallback(() => {
     trainSignsRef.current = null;
     setActiveModuleId(null);
-    setScreen('training');
-  }, []);
+    navigate('/train');
+  }, [navigate]);
 
   const goGame = useCallback(() => {
     gameSignsRef.current = null;
     setActiveModuleId(null);
-    setScreen('game');
-  }, []);
+    navigate('/game');
+  }, [navigate]);
+
+  const goQuiz = useCallback(() => {
+    navigate('/quiz');
+  }, [navigate]);
 
   const goModuleTraining = useCallback((moduleId) => {
     const signs = getModuleTrainableSigns(moduleId);
     trainSignsRef.current = signs;
     setActiveModuleId(moduleId);
-    setScreen('training');
-  }, []);
+    navigate('/train');
+  }, [navigate]);
 
   const goModuleGame = useCallback((moduleId) => {
     const signs = getModuleTrainableSigns(moduleId);
     gameSignsRef.current = signs;
     setActiveModuleId(moduleId);
-    setScreen('game');
-  }, []);
+    navigate('/game');
+  }, [navigate]);
 
   const goModuleDetail = useCallback((moduleId) => {
     setActiveModuleId(moduleId);
-    setScreen('module-detail');
-  }, []);
+    navigate(`/modules/${moduleId}`);
+  }, [navigate]);
 
   // ── Training complete ───────────────────────────────────
-  const handleTrainingComplete = useCallback((data, skipped) => {
+  const handleTrainingComplete = useCallback(async (data, skipped) => {
     const newLabels = new Set(data.map((s) => s.label));
     const kept = trainingDataRef.current.filter((s) => !newLabels.has(s.label));
     const merged = [...kept, ...data];
@@ -147,35 +207,50 @@ export default function App() {
     setTrained(true);
 
     try {
-      saveGestures(merged, skipped || []);
+      await saveGestures(merged, skipped || []);
       setStorageError(null);
+      toast('Training data saved', 'success');
     } catch (e) {
       setStorageError(e.message);
+      toast(e.message, 'error');
     }
 
-    refreshSummary();
+    await refreshSummary();
 
     if (activeModuleId) {
-      setScreen('module-detail');
+      navigate(`/modules/${activeModuleId}`);
     } else {
-      setScreen('welcome');
+      navigate('/');
     }
-  }, [refreshSummary, activeModuleId]);
+  }, [refreshSummary, activeModuleId, toast, navigate]);
 
   // ── Fingerspell training complete ───────────────────────
-  const handleFsTrainingComplete = useCallback((data, skipped) => {
+  const handleFsTrainingComplete = useCallback(async (data, skipped) => {
     fsTrainingDataRef.current = data;
     try {
-      saveFingerspellData(data, skipped || []);
+      await saveFingerspellData(data, skipped || []);
     } catch { /* ignore */ }
-    setFsLettersTrained(getTrainedLetters().length);
-    setScreen('fingerspell');
-  }, []);
+    const letters = await getTrainedLetters();
+    setFsLettersTrained(letters.length);
+    navigate('/fingerspell');
+  }, [navigate]);
 
   // ── Game complete ───────────────────────────────────────
-  const handleGameComplete = useCallback((correct, rounds) => {
+  const handleGameComplete = useCallback((correct, rounds, signResults) => {
     setScore(correct);
     setTotal(rounds);
+    lastGameModeRef.current = 'game';
+
+    // Record SRS results for each sign played
+    if (signResults && Array.isArray(signResults)) {
+      for (const { signId, correct: wasCorrect } of signResults) {
+        recordSignResult(signId, wasCorrect);
+      }
+    }
+    recordActivity();
+
+    // Add to leaderboard
+    addScore({ name: getPlayerName() || 'Anonymous', score: correct, total: rounds, mode: 'game' });
 
     if (activeModuleId) {
       const accuracy = rounds > 0 ? correct / rounds : 0;
@@ -189,13 +264,13 @@ export default function App() {
       });
     }
 
-    setScreen('score');
-  }, [activeModuleId]);
+    navigate('/score');
+  }, [activeModuleId, navigate]);
 
   // ── Gesture management ──────────────────────────────────
-  const handleDeleteGesture = useCallback((gestureId) => {
+  const handleDeleteGesture = useCallback(async (gestureId) => {
     try {
-      const result = deleteGesture(gestureId);
+      const result = await deleteGesture(gestureId);
       if (result) {
         trainingDataRef.current = result.samples;
         skippedGesturesRef.current = result.skippedGestures;
@@ -208,21 +283,23 @@ export default function App() {
       setStorageError(null);
     } catch (e) {
       setStorageError(e.message);
+      toast(e.message, 'error');
     }
-    refreshSummary();
-  }, [refreshSummary]);
+    await refreshSummary();
+  }, [refreshSummary, toast]);
 
-  const handleClearAll = useCallback(() => {
-    clearAllGestures();
+  const handleClearAll = useCallback(async () => {
+    await clearAllGestures();
     trainingDataRef.current = [];
     skippedGesturesRef.current = [];
     setTrained(false);
     setStorageError(null);
-    refreshSummary();
-  }, [refreshSummary]);
+    await refreshSummary();
+    toast('All gesture data cleared', 'info');
+  }, [refreshSummary, toast]);
 
-  const handleExport = useCallback(() => {
-    const data = exportGestures();
+  const handleExport = useCallback(async () => {
+    const data = await exportGestures();
     if (!data) return;
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -235,142 +312,210 @@ export default function App() {
 
   const handleImport = useCallback((file) => {
     const reader = new FileReader();
-    reader.onload = () => {
+    reader.onload = async () => {
       try {
         const parsed = JSON.parse(reader.result);
-        const result = importGestures(parsed);
+        const result = await importGestures(parsed);
         trainingDataRef.current = result.samples;
         skippedGesturesRef.current = result.skippedGestures;
         setTrained(result.samples.length > 0);
         setStorageError(null);
-        refreshSummary();
+        await refreshSummary();
+        toast('Gesture data imported successfully', 'success');
       } catch (e) {
         setStorageError(e.message);
+        toast(e.message, 'error');
       }
     };
-    reader.onerror = () => setStorageError('Failed to read file.');
+    reader.onerror = () => {
+      setStorageError('Failed to read file.');
+      toast('Failed to read file', 'error');
+    };
     reader.readAsText(file);
-  }, [refreshSummary]);
+  }, [refreshSummary, toast]);
 
   const trainingSigns = trainSignsRef.current || GESTURES;
   const gameSigns = gameSignsRef.current || GESTURES;
 
   return (
     <div className="app">
-      <div className="celtic-bg" />
+      <a href="#main-content" className="skip-to-content">Skip to content</a>
+      <div className="celtic-bg" aria-hidden="true" />
 
-      {screen === 'welcome' && (
-        <WelcomeScreen
-          trained={trained}
-          gestureSummary={gestureSummary}
-          storageError={storageError}
-          onTrain={goTraining}
-          onPlay={goGame}
-          onClearAll={handleClearAll}
-          onAbout={goAbout}
-          onModules={goModules}
-          onSettings={goSettings}
-          onMySigns={goMySigns}
-          onFingerspell={goFingerspell}
-        />
-      )}
+      {/* Screen reader live regions */}
+      <div id="sr-announcer" className="sr-only" aria-live="polite" aria-atomic="true" />
+      <div id="sr-announcer-assertive" className="sr-only" aria-live="assertive" aria-atomic="true" />
 
-      {screen === 'about' && <AboutISL onBack={goWelcome} />}
-      {screen === 'settings' && <SettingsPanel onBack={goWelcome} />}
+      <main id="main-content" tabIndex={-1}>
+        <Suspense fallback={<LoadingScreen />}>
+          <Routes>
+            <Route path="/" element={
+              <WelcomeScreen
+                trained={trained}
+                gestureSummary={gestureSummary}
+                storageError={storageError}
+                defaultModelAvailable={defaultModelAvailable && !trained}
+                onQuickStart={handleQuickStart}
+                onTrain={goTraining}
+                onPlay={goGame}
+                onClearAll={handleClearAll}
+                onAbout={goAbout}
+                onModules={goModules}
+                onSettings={goSettings}
+                onMySigns={goMySigns}
+                onFingerspell={goFingerspell}
+                onQuiz={goQuiz}
+                onReview={goReview}
+                onProgress={goProgress}
+                onLeaderboard={goLeaderboard}
+              />
+            } />
 
-      {screen === 'my-signs' && (
-        <MySignsScreen
-          gestureSummary={gestureSummary}
-          onDeleteGesture={handleDeleteGesture}
-          onClearAll={handleClearAll}
-          onExport={handleExport}
-          onImport={handleImport}
-          onBack={goWelcome}
-        />
-      )}
+            <Route path="/about" element={<AboutISL onBack={goWelcome} />} />
+            <Route path="/settings" element={<SettingsPanel onBack={goWelcome} />} />
 
-      {screen === 'modules' && (
-        <ModuleSelect
-          moduleProgress={moduleProgress}
-          onSelectModule={goModuleDetail}
-          onBack={goWelcome}
-        />
-      )}
+            <Route path="/my-signs" element={
+              <MySignsScreen
+                gestureSummary={gestureSummary}
+                onDeleteGesture={handleDeleteGesture}
+                onClearAll={handleClearAll}
+                onExport={handleExport}
+                onImport={handleImport}
+                onBack={goWelcome}
+              />
+            } />
 
-      {screen === 'module-detail' && activeModuleId && (
-        <ModuleDetail
-          moduleId={activeModuleId}
-          trained={trained}
-          onStartTraining={goModuleTraining}
-          onStartGame={goModuleGame}
-          onBack={goModules}
-        />
-      )}
+            <Route path="/modules" element={
+              <ModuleSelect
+                moduleProgress={moduleProgress}
+                onSelectModule={goModuleDetail}
+                onBack={goWelcome}
+              />
+            } />
 
-      {screen === 'training' && (
-        <TrainingScreen
-          trainingDataRef={trainingDataRef}
-          existingGestures={gestureSummary.map((g) => g.id)}
-          signsList={trainingSigns}
-          onComplete={handleTrainingComplete}
-          onBack={activeModuleId ? () => setScreen('module-detail') : goWelcome}
-        />
-      )}
+            <Route path="/modules/:moduleId" element={
+              <ModuleDetailRoute
+                trained={trained}
+                onStartTraining={goModuleTraining}
+                onStartGame={goModuleGame}
+                onBack={goModules}
+              />
+            } />
 
-      {screen === 'game' && (
-        <GameScreen
-          trainingData={trainingDataRef.current}
-          skippedGestures={skippedGesturesRef.current}
-          signsList={gameSigns}
-          onComplete={handleGameComplete}
-          onExit={activeModuleId ? () => setScreen('module-detail') : goWelcome}
-        />
-      )}
+            <Route path="/train" element={
+              <TrainingScreen
+                trainingDataRef={trainingDataRef}
+                existingGestures={gestureSummary.map((g) => g.id)}
+                signsList={trainingSigns}
+                onComplete={handleTrainingComplete}
+                onBack={activeModuleId ? () => navigate(`/modules/${activeModuleId}`) : goWelcome}
+              />
+            } />
 
-      {screen === 'score' && (
-        <ScoreScreen
-          score={score}
-          total={total}
-          onPlayAgain={activeModuleId ? () => goModuleGame(activeModuleId) : goGame}
-          onHome={goWelcome}
-        />
-      )}
+            <Route path="/game" element={
+              <GameScreen
+                trainingData={trainingDataRef.current}
+                skippedGestures={skippedGesturesRef.current}
+                signsList={gameSigns}
+                onComplete={handleGameComplete}
+                onExit={activeModuleId ? () => navigate(`/modules/${activeModuleId}`) : goWelcome}
+              />
+            } />
 
-      {screen === 'fingerspell' && (
-        <FingerspellScreen
-          fsLettersTrained={fsLettersTrained}
-          onGame={goFingerspellGame}
-          onCommunicate={goFingerspellComm}
-          onTrain={goFingerspellTraining}
-          onBack={goWelcome}
-        />
-      )}
+            <Route path="/score" element={
+              <ScoreScreen
+                score={score}
+                total={total}
+                gameMode={lastGameModeRef.current}
+                onPlayAgain={activeModuleId ? () => goModuleGame(activeModuleId) : goGame}
+                onHome={goWelcome}
+                onLeaderboard={goLeaderboard}
+              />
+            } />
 
-      {screen === 'fingerspell-training' && (
-        <FingerspellTraining
-          onComplete={handleFsTrainingComplete}
-          onBack={goFingerspell}
-        />
-      )}
+            <Route path="/quiz" element={
+              <QuizMode
+                signs={getAllSigns()}
+                onComplete={(correct, rounds) => {
+                  setScore(correct);
+                  setTotal(rounds);
+                  lastGameModeRef.current = 'quiz';
+                  recordActivity();
+                  addScore({ name: getPlayerName() || 'Anonymous', score: correct, total: rounds, mode: 'quiz' });
+                  navigate('/score');
+                }}
+                onBack={goWelcome}
+              />
+            } />
 
-      {screen === 'fingerspell-game' && (
-        <FingerspellGame
-          trainingData={fsTrainingDataRef.current}
-          onComplete={(correct, rounds) => {
-            setScore(correct);
-            setTotal(rounds);
-            setScreen('score');
-          }}
-          onExit={goFingerspell}
-        />
-      )}
+            <Route path="/fingerspell" element={
+              <FingerspellScreen
+                fsLettersTrained={fsLettersTrained}
+                onGame={goFingerspellGame}
+                onCommunicate={goFingerspellComm}
+                onTrain={goFingerspellTraining}
+                onBack={goWelcome}
+              />
+            } />
 
-      {screen === 'fingerspell-comm' && (
-        <FingerspellComm
-          trainingData={fsTrainingDataRef.current}
-          onExit={goFingerspell}
-        />
-      )}
+            <Route path="/fingerspell/train" element={
+              <FingerspellTraining
+                onComplete={handleFsTrainingComplete}
+                onBack={goFingerspell}
+              />
+            } />
+
+            <Route path="/fingerspell/game" element={
+              <FingerspellGame
+                trainingData={fsTrainingDataRef.current}
+                onComplete={(correct, rounds) => {
+                  setScore(correct);
+                  setTotal(rounds);
+                  lastGameModeRef.current = 'fingerspell';
+                  recordActivity();
+                  addScore({ name: getPlayerName() || 'Anonymous', score: correct, total: rounds, mode: 'fingerspell' });
+                  navigate('/score');
+                }}
+                onExit={goFingerspell}
+              />
+            } />
+
+            <Route path="/fingerspell/communicate" element={
+              <FingerspellComm
+                trainingData={fsTrainingDataRef.current}
+                onExit={goFingerspell}
+              />
+            } />
+
+            <Route path="/review" element={<ReviewScreen onBack={goWelcome} />} />
+            <Route path="/progress" element={<ProgressDashboard onBack={goWelcome} />} />
+            <Route path="/leaderboard" element={<Leaderboard onBack={goWelcome} />} />
+
+            {/* Fallback — redirect unknown routes home */}
+            <Route path="*" element={
+              <WelcomeScreen
+                trained={trained}
+                gestureSummary={gestureSummary}
+                storageError={storageError}
+                defaultModelAvailable={defaultModelAvailable && !trained}
+                onQuickStart={handleQuickStart}
+                onTrain={goTraining}
+                onPlay={goGame}
+                onClearAll={handleClearAll}
+                onAbout={goAbout}
+                onModules={goModules}
+                onSettings={goSettings}
+                onMySigns={goMySigns}
+                onFingerspell={goFingerspell}
+                onQuiz={goQuiz}
+                onReview={goReview}
+                onProgress={goProgress}
+                onLeaderboard={goLeaderboard}
+              />
+            } />
+          </Routes>
+        </Suspense>
+      </main>
     </div>
   );
 }
